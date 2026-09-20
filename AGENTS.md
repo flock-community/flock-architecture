@@ -20,7 +20,7 @@ If you think the site needs content that fits none of the three pillars, raise i
 
 ## Site structure
 
-The site starts with an overview of the three pillars. A visitor first sees what the three concepts are, in a few sentences each, and how they fit together. From the overview, the visitor can dive into each pillar, and each pillar has its own deep-dive section.
+The site starts with an overview of the three pillars. A visitor first sees what the three concepts are, in a few sentences each, and how they fit together. From the overview, the visitor can dive into each pillar, and each pillar has its own deep dive. In the menu the three deep dives sit together in a section called "Three pillars" (`docs/three-pillars/`, one folder per pillar).
 
 After the deep dives comes one more section, "Study material". It is not a fourth topic: it never explains a concept, it points to material in which the concepts can be seen at work, with a page per item.
 
