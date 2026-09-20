@@ -50,6 +50,12 @@ The `transcripts/` folder holds raw, machine-made transcripts of the conversatio
 
 The transcripts often call the first pillar "contract first". That name was deliberately replaced by "Specified contracts": what matters is that an explicit specification of the contract exists, not that it is written before the code. Always use "Specified contracts" on the site.
 
+## Publishing
+
+Every push to `main` is built and deployed to the public site, https://architecture.flock.community, by `.github/workflows/deploy.yml`. Treat `main` as live. Work that isn't ready for readers goes on a branch and through a pull request, which runs the same build as a check.
+
+The custom domain is set in the repository's Pages settings, and its DNS is proxied by Cloudflare. If the domain is ever removed, `url` and `baseUrl` in `docusaurus.config.js` have to change with it. The organisation is on GitHub's Free plan, where Pages only works for public repositories, so making this repository private takes the site down.
+
 ## Working on the site
 
 - `npm start` runs the site locally with live reload.
