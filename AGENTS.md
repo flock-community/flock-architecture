@@ -22,7 +22,9 @@ If you think the site needs content that fits none of the three pillars, raise i
 
 The site starts with an overview of the three pillars. A visitor first sees what the three concepts are, in a few sentences each, and how they fit together. From the overview, the visitor can dive into each pillar, and each pillar has its own deep-dive section.
 
-Overview first, then three deep dives: that is the whole shape of the site. Keep the navigation that simple.
+After the deep dives comes one more section, "Study material". It is not a fourth topic: it never explains a concept, it points to material in which the concepts can be seen at work, with a page per item.
+
+Overview first, then three deep dives, then the study material: that is the whole shape of the site. Keep the navigation that simple.
 
 ## Keep the deep dives free of overlap
 
@@ -33,6 +35,12 @@ In practice:
 - **Every topic has exactly one home.** Before writing about something, decide which pillar owns it. Overlap creeps in at the borders: the format of an event, for example, touches both specified contracts and event-driven. Pick the one pillar where the topic fits best, explain it there, and link to it from the other pillar instead of explaining it again.
 - **How the pillars relate belongs in the overview.** The way the pillars depend on and strengthen each other is explained on the overview page, not inside the deep dives. A deep dive may point to another pillar with a single sentence and a link, and no more than that.
 - **Read before you write.** Before adding or changing content in one deep dive, read the other two so you know what they already cover. When you finish, check your text for passages that repeat or re-explain something from another pillar, and replace them with a link.
+
+## Study material
+
+The site points readers to material in which they can see the ideas at work, made by Flock engineers: at the moment a code repository and a workshop. The material lives in the "Study material" section (`docs/study-material/`): an index page that lists every item in a sentence, and one page per item that explains what it is, who made it, what it shows and where to look, and how to get or run it. Those pages describe the material and link to the deep dives for the ideas; they never explain a pillar again.
+
+Two places point into the section and say no more than needed. The overview page lists the items in a sentence each, with the pillars they show. A deep dive may list, under a "Study material" heading at the end, only the material that shows its own pillar, with a sentence or two on what to look for in it, linking to the item's page. Don't list material in a deep dive whose pillar it does not show. Describe material from what it actually contains, so check it before you write about it.
 
 ## Audience and tone
 

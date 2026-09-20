@@ -92,6 +92,11 @@ const config = {
             position: 'right',
             label: 'Event-driven',
           },
+          {
+            to: '/study-material',
+            position: 'right',
+            label: 'Study material',
+          },
         ],
       },
       footer: {
@@ -103,6 +108,14 @@ const config = {
               {label: 'Specified contracts', to: '/specified-contracts'},
               {label: 'Domain isolation', to: '/domain-isolation'},
               {label: 'Event-driven', to: '/event-driven'},
+            ],
+          },
+          {
+            title: 'Study material',
+            items: [
+              {label: 'All study material', to: '/study-material'},
+              {label: 'The pragmatic repository', to: '/study-material/pragmatic'},
+              {label: 'The workshop', to: '/study-material/workshop'},
             ],
           },
           {
