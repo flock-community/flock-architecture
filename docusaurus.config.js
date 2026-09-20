@@ -19,11 +19,11 @@ const config = {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
 
-  // Published on GitHub Pages: https://flock-community.github.io/flock-architecture/
-  url: 'https://flock-community.github.io',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/flock-architecture/',
+  // Published on GitHub Pages under a custom domain, which is set in the
+  // repository's Pages settings. Without that domain the site would live at
+  // flock-community.github.io/flock-architecture/ and need that as baseUrl.
+  url: 'https://architecture.flock.community',
+  baseUrl: '/',
   // GitHub Pages serves /domain-isolation from domain-isolation.html without a redirect
   trailingSlash: false,
 
