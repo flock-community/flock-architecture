@@ -14,7 +14,7 @@ The domain is the part of the software that captures how the business works: its
 Domain isolation means keeping that part on its own. It has two sides, and the second is the one that gets forgotten:
 
 1. **Free of technology.** The domain doesn't depend on a database, a framework or a messaging system. They depend on it.
-2. **Free of other domains.** The domain doesn't depend on another part's model either. Parts of the business don't overlap, and where they touch they refer to each other by an identifier and nothing more.
+2. **Its own bounded context.** The domain's model holds within a boundary of its own and doesn't depend on another part's model. Where two parts of the business touch, they refer to each other by an identifier and nothing more.
 
 Of the three pillars, this is the one we compromise on least. This deep dive explains both sides and what they mean for your code and your database. Then it turns to the harder questions: how to find the boundaries, how to guard them, and when you can do without it.
 
@@ -87,7 +87,7 @@ An isolated domain can be built before anything else exists. We have started new
 
 This goes against the habit of starting with the API or the tables, which are tangible and easy to show around. But as long as nobody depends on it, an interface is cheap to redraw. A misunderstanding of the business is not: it ends up in every layer built on top of it. And a model has become easier to show than it used to be. Diagrams generated straight from the domain code are a good thing to put in front of the people from the business.
 
-## Free of other domains
+## Its own bounded context
 
 The second side is about concepts rather than technology. A domain without a single library dependency can still lean on another domain's model, and that dependency hurts in the same way: the domain now changes for someone else's reasons.
 
