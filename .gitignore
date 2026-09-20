@@ -20,4 +20,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local recordings
-/*.m4a
+*.m4a
+
+# Editor
+.idea/
+
+# Raw recordings and transcripts of internal conversations: source material
+# for the site, kept out of the repository
+/transcripts/
