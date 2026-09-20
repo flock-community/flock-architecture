@@ -1,23 +1,239 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
+/*
+ * The overview (hero, picture and the three pillars) is brand-black in both
+ * colour modes. Circles belong to the picture; the page itself is
+ * square-cornered.
  */
+.onBlack {
+  --ov-text: #f1f1f1;
+  --ov-muted: #a9b5b3;
+  --ov-line: #1f2828;
+  --ov-yellow: #f0e043;
+  --ov-turquoise: #23e5db;
 
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
+  background: #070908;
+  color: var(--ov-text);
+}
+
+.hero {
+  padding: 3.75rem 0 2.25rem;
   overflow: hidden;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+.heroText {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 3rem;
+  align-items: end;
+}
+
+.heroTitle {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.3rem, 4.5vw, 3.9rem);
+  font-weight: 800;
+  font-stretch: 122%;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.heroLead {
+  max-width: 30rem;
+  margin: 0 0 0.35rem;
+  color: var(--ov-muted);
+  font-size: 1.1875rem;
+  line-height: 1.55;
+}
+
+.sceneWrap {
+  margin-top: 2.25rem;
+}
+
+/* The picture never gets smaller than it can be read. On narrower screens it
+   stays this wide and shows its middle; the hero clips the rest. */
+.sceneWrap svg {
+  --scene-min: 900px;
+
+  width: max(100%, var(--scene-min));
+  max-width: none;
+  margin-left: calc((100% - max(100%, var(--scene-min))) / 2);
+}
+
+/* The pillars */
+.pillars {
+  border-top: 1px solid var(--ov-line);
+}
+
+.pillarGrid {
+  --pillar-pad: 2.25rem;
+
+  display: grid;
+  /* The middle column has padding on both sides, so it gets that much extra
+     width and the text is equally wide in all three. */
+  grid-template-columns:
+    minmax(0, 1fr)
+    calc((100% - 4 * var(--pillar-pad)) / 3 + 2 * var(--pillar-pad))
+    minmax(0, 1fr);
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem var(--pillar-pad) 3.5rem;
+  border-left: 1px solid var(--ov-line);
+}
+
+.pillar:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.pillar:last-child {
+  padding-right: 0;
+}
+
+.pillarGlyph {
+  max-width: 20rem;
+  margin-bottom: 1.75rem;
+}
+
+.pillarTitle {
+  margin: 0 0 0.6rem;
+  font-size: 1.6rem;
+  font-weight: 750;
+  font-stretch: 118%;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.pillarTitle a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.pillarTitle a:hover {
+  color: var(--ov-yellow);
+  text-decoration: none;
+}
+
+.pillarEssence {
+  margin: 0 0 0.9rem;
+  color: var(--ov-text);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.pillarBody {
+  margin: 0 0 1.9rem;
+  color: var(--ov-muted);
+  line-height: 1.6;
+}
+
+.deepDive {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 0.75rem 1.4rem;
+  background: var(--ov-turquoise);
+  color: #070908;
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 120ms ease-out;
+}
+
+.deepDive:hover {
+  background: var(--ov-yellow);
+  color: #070908;
+  text-decoration: none;
+}
+
+.onBlack a:focus-visible {
+  outline: 3px solid var(--ov-yellow);
+  outline-offset: 3px;
+}
+
+/* How the three fit together, and why these three */
+.prose {
+  padding: 4.5rem 0 5rem;
+}
+
+.proseGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4rem;
+}
+
+.proseTitle {
+  margin: 0 0 1.1rem;
+  font-size: 1.6rem;
+  font-weight: 750;
+  font-stretch: 118%;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.prose p {
+  max-width: 34rem;
+  line-height: 1.65;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 996px) {
+  .hero {
+    padding-top: 3rem;
+  }
+
+  .heroText {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .pillarGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pillar,
+  .pillar:first-child,
+  .pillar:last-child {
+    padding: 2.25rem 0 2.75rem;
+    border-left: 0;
+    border-top: 1px solid var(--ov-line);
+  }
+
+  .pillar:first-child {
+    border-top: 0;
+  }
+
+  .prose {
+    padding: 3rem 0 3.5rem;
+  }
+
+  .proseGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.75rem;
   }
 }
 
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.1rem;
+    font-stretch: 110%;
+  }
+
+  .sceneWrap {
+    margin-top: 2rem;
+  }
 }

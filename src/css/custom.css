@@ -1,30 +1,80 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Global styles. The classic template bundles Infima, and the variables below
+ * retune it to Flock's colours: black, yellow and turquoise.
  */
 
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --fa-black: #070908;
+  --fa-yellow: #f0e043;
+  --fa-turquoise: #23e5db;
+
+  /* Turquoise is too light for text on a light page, so links use a deep teal. */
+  --ifm-color-primary: #08736e;
+  --ifm-color-primary-dark: #076863;
+  --ifm-color-primary-darker: #07625e;
+  --ifm-color-primary-darkest: #06514d;
+  --ifm-color-primary-light: #097f79;
+  --ifm-color-primary-lighter: #09847e;
+  --ifm-color-primary-lightest: #0b958f;
+
+  --ifm-background-color: #f6f8f7;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-font-color-base: #0d0e0d;
+  --ifm-toc-border-color: #d5dddb;
+
+  --ifm-font-family-base: 'Archivo Variable', system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-heading-font-weight: 750;
+  --ifm-font-size-base: 106.25%;
+  --ifm-line-height-base: 1.65;
   --ifm-code-font-size: 95%;
+
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #23e5db;
+  --ifm-color-primary-dark: #1bd3c9;
+  --ifm-color-primary-darker: #19c7be;
+  --ifm-color-primary-darkest: #15a49d;
+  --ifm-color-primary-light: #3de8df;
+  --ifm-color-primary-lighter: #4aeae1;
+  --ifm-color-primary-lightest: #72efe8;
+
+  --ifm-background-color: var(--fa-black);
+  --ifm-background-surface-color: #0d1110;
+  --ifm-navbar-background-color: var(--fa-black);
+  --ifm-font-color-base: #f1f1f1;
+  --ifm-toc-border-color: #1f2828;
+
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Headings use the expanded width of Archivo, the text its regular width. */
+h1,
+h2,
+h3 {
+  font-stretch: 118%;
+  letter-spacing: -0.015em;
+}
+
+.navbar__title {
+  font-stretch: 114%;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+[data-theme='dark'] .navbar {
+  border-bottom: 1px solid #1f2828;
+  box-shadow: none;
+}
+
+.footer--dark {
+  --ifm-footer-background-color: var(--fa-black);
+  border-top: 1px solid #1f2828;
+}
+
+.footer--dark .footer__link-item:hover {
+  color: var(--fa-yellow);
 }

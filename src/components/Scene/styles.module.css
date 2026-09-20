@@ -1,0 +1,144 @@
+/* Colours for a scene on the light page background */
+.scene {
+  --s-inside: #f0e043;
+  --s-inside-stroke: #0d0e0d;
+  --s-edge: #0a8f88;
+  --s-between: #0d0e0d;
+  --s-link: #b4c0be;
+  --s-dim: #c5cfcd;
+  --s-dim-fill: #e3e9e7;
+  --s-callout: #0d0e0d;
+  --s-callout-line: #7d8a88;
+
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* On the dark page background, and on the hero, which is black in both modes */
+:global([data-theme='dark']) .scene,
+.scene.onBlack {
+  --s-inside-stroke: transparent;
+  --s-edge: #23e5db;
+  --s-between: #ffffff;
+  --s-link: #33403f;
+  --s-dim: #2c3837;
+  --s-dim-fill: #141a19;
+  --s-callout: #f1f1f1;
+  --s-callout-line: #6f7d7b;
+}
+
+/* Which roles are lit */
+.scene {
+  --c-inside: var(--s-inside);
+  --c-inside-stroke: var(--s-inside-stroke);
+  --c-edge: var(--s-edge);
+  --c-between: var(--s-between);
+}
+
+.scene[data-highlight='inside'] {
+  --c-edge: var(--s-dim);
+  --c-between: var(--s-dim);
+}
+
+.scene[data-highlight='edge'] {
+  --c-inside: var(--s-dim-fill);
+  --c-inside-stroke: transparent;
+  --c-between: var(--s-dim);
+}
+
+.scene[data-highlight='between'] {
+  --c-inside: var(--s-dim-fill);
+  --c-inside-stroke: transparent;
+  --c-edge: var(--s-dim);
+}
+
+.links line {
+  stroke: var(--s-link);
+  stroke-width: 1.5;
+}
+
+.disc {
+  fill: var(--c-inside);
+  stroke: var(--c-inside-stroke);
+  stroke-width: 1.5;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--c-edge);
+  stroke-width: 3;
+}
+
+.ports circle {
+  fill: var(--c-edge);
+}
+
+.domainLabel {
+  fill: #0d0e0d;
+  font-size: 19px;
+  font-weight: 650;
+  text-anchor: middle;
+}
+
+/* Events. Without motion they rest evenly spaced along their line. */
+.dots circle {
+  fill: var(--c-between);
+  transform: translate(
+    calc(var(--dx) * var(--p)),
+    calc(var(--dy) * var(--p))
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animated .dots circle {
+    animation: travel var(--dur) linear infinite;
+    animation-delay: calc(var(--dur) * var(--p) * -1);
+  }
+}
+
+@keyframes travel {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+}
+
+.callouts polyline {
+  fill: none;
+  stroke: var(--s-callout-line);
+  stroke-width: 1.25;
+}
+
+.callouts circle {
+  fill: var(--s-callout);
+}
+
+.callouts circle.onDisc {
+  fill: #0d0e0d;
+}
+
+.callouts text {
+  fill: var(--s-callout);
+  font-size: 19px;
+  font-weight: 600;
+  font-stretch: 112%;
+}
+
+/* Below desktop width the hero may crop the picture, so the labels go; the
+   pillars underneath name the parts. */
+@media (max-width: 996px) {
+  .callouts {
+    display: none;
+  }
+}
