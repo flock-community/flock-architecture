@@ -1,3 +1,4 @@
+import {Fragment} from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
@@ -59,6 +60,40 @@ const PILLARS = [
   },
 ];
 
+// Material in which the ideas can be seen at work. `shows` names the pillars
+// it covers, by their path.
+const REFERENCES = [
+  {
+    kind: 'Code on GitHub',
+    title: 'The pragmatic repository',
+    href: 'https://github.com/flock-community/pragmatic',
+    shows: ['/specified-contracts', '/domain-isolation'],
+    body: (
+      <>
+        A small but complete application in Kotlin, with its domain in a
+        module of its own and its API written down as a specification. It
+        shows a pragmatic functional style: invalid input is turned away at
+        the edge, and errors are ordinary values rather than exceptions.
+      </>
+    ),
+  },
+  {
+    kind: 'Hands-on workshop',
+    title: 'Pragmatic Functional Programming in Kotlin',
+    href: 'https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/',
+    shows: ['/domain-isolation'],
+    body: (
+      <>
+        A workshop by Jerre van Veluw, software engineer at Flock, at Kotlin
+        Dev Day in Amsterdam. You take an existing application and isolate
+        its domain step by step, in Kotlin with Spring Boot and Arrow. The
+        workshop and the repository share a name: the repository has the
+        shape the workshop works towards.
+      </>
+    ),
+  },
+];
+
 function Pillar({title, to, highlight, deepDive, essence, body}) {
   return (
     <article className={styles.pillar}>
@@ -71,6 +106,29 @@ function Pillar({title, to, highlight, deepDive, essence, body}) {
       <Link className={styles.deepDive} data-role={highlight} to={to}>
         {deepDive}
       </Link>
+    </article>
+  );
+}
+
+function Reference({kind, title, href, shows, body}) {
+  const pillars = shows.map((to) => PILLARS.find((pillar) => pillar.to === to));
+  return (
+    <article className={styles.reference}>
+      <p className={styles.referenceKind}>{kind}</p>
+      <Heading as="h3" className={styles.referenceTitle}>
+        <Link href={href}>{title}</Link>
+      </Heading>
+      <p>{body}</p>
+      <p className={styles.referenceShows}>
+        Shows{' '}
+        {pillars.map((pillar, i) => (
+          <Fragment key={pillar.to}>
+            {i > 0 && (i === pillars.length - 1 ? ' and ' : ', ')}
+            <Link to={pillar.to}>{pillar.title}</Link>
+          </Fragment>
+        ))}
+        .
+      </p>
     </article>
   );
 }
@@ -152,6 +210,29 @@ export default function Home() {
                 take each of them depends on your situation. It is about the
                 right choice, not the best one.
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="study-material"
+          className={styles.references}
+          aria-labelledby="study-material-title">
+          <div className="container">
+            <Heading
+              as="h2"
+              id="study-material-title"
+              className={styles.proseTitle}>
+              Study material
+            </Heading>
+            <p className={styles.referencesLead}>
+              Two places to see the ideas at work, both made by engineers at
+              Flock.
+            </p>
+            <div className={styles.referenceGrid}>
+              {REFERENCES.map((reference) => (
+                <Reference key={reference.href} {...reference} />
+              ))}
             </div>
           </div>
         </section>

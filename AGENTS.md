@@ -34,6 +34,10 @@ In practice:
 - **How the pillars relate belongs in the overview.** The way the pillars depend on and strengthen each other is explained on the overview page, not inside the deep dives. A deep dive may point to another pillar with a single sentence and a link, and no more than that.
 - **Read before you write.** Before adding or changing content in one deep dive, read the other two so you know what they already cover. When you finish, check your text for passages that repeat or re-explain something from another pillar, and replace them with a link.
 
+## Study material
+
+The site points readers to material in which they can see the ideas at work, made by Flock engineers: at the moment a code repository and a workshop. It has one home, the "Study material" section on the overview page, where each item gets a sentence on what it is and a note of which pillars it shows. A deep dive may list, under a "Study material" heading at the end, only the material that shows its own pillar, with a sentence or two on what to look for in it. Don't describe the material again there, and don't list it in a deep dive whose pillar it does not show. Describe material from what it actually contains, so check it before you write about it.
+
 ## Audience and tone
 
 The readers are software engineers and managers, and every page has to work for both. A manager without a programming background should be able to follow it. An engineer should still find it accurate and worth reading.

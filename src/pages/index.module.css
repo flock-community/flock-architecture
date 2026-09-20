@@ -226,6 +226,53 @@
   margin-bottom: 0;
 }
 
+/* Study material: where to see the ideas at work */
+.references {
+  padding: 4rem 0 5rem;
+  border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+.referencesLead {
+  max-width: 34rem;
+  margin: 0 0 2.5rem;
+  line-height: 1.65;
+}
+
+.referenceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4rem;
+}
+
+.referenceKind {
+  margin: 0 0 0.5rem;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.referenceTitle {
+  margin: 0 0 0.75rem;
+  font-size: 1.3rem;
+  font-weight: 750;
+  font-stretch: 118%;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.reference p {
+  max-width: 34rem;
+  line-height: 1.65;
+}
+
+.referenceShows {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.9375rem;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -268,6 +315,15 @@
   .proseGrid {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.75rem;
+  }
+
+  .references {
+    padding: 3rem 0 3.5rem;
+  }
+
+  .referenceGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
   }
 }
 

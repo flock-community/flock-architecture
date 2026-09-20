@@ -213,3 +213,8 @@ What isn't a reason: that the framework makes the shortcut easy. Frameworks are 
 - Inside a boundary there is one language: the language of the business.
 
 Domain isolation is the inside of the circle. What happens at its edge is described in [Specified contracts](/specified-contracts), what travels between circles in [Event-driven](/event-driven), and how the three depend on each other in the [overview](/).
+
+## Study material
+
+- [The pragmatic repository](https://github.com/flock-community/pragmatic) is a small, complete application whose domain lives in a module of its own. Compare the `domain` and `app` modules: the domain holds the model and the rules, knows nothing about the web or the database, and only states what it needs from the outside, such as a place to keep users. The application around it provides those things.
+- [Pragmatic Functional Programming in Kotlin](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/), a hands-on workshop by Jerre van Veluw at Kotlin Dev Day, takes an existing application and isolates its domain step by step: move the domain into a module of its own, compile to find every place where the rest of the code reached into it, and repair those places until the separation holds.
