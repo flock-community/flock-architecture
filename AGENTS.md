@@ -16,15 +16,15 @@ The whole site is built around three concepts:
 
 These are the pillars of the site. The navigation, the page structure and the story all follow from them. Use these exact names everywhere.
 
-If you think the site needs content that fits none of the three pillars, raise it with the user instead of adding a fourth top-level topic.
+If you think the site needs content that fits none of the three pillars, raise it with the user instead of adding a fourth top-level topic. The two sections beside the pillars, Study material and Tools, support the pillars rather than adding to them; both are described below.
 
 ## Site structure
 
 The site starts with an overview of the three pillars. A visitor first sees what the three concepts are, in a few sentences each, and how they fit together. From the overview, the visitor can dive into each pillar, and each pillar has its own deep dive. In the menu the three deep dives sit together in a section called "Three pillars" (`docs/three-pillars/`, one folder per pillar).
 
-After the deep dives comes one more section, "Study material". It is not a fourth topic: it never explains a concept, it points to material in which the concepts can be seen at work, with a page per item.
+After the deep dives come two more sections, "Study material" and "Tools". Neither is a fourth topic, and neither explains a concept. Study material points to material in which the concepts can be seen at work, and Tools describes the tools Flock built to put a pillar into practice, each with a page per item.
 
-Overview first, then three deep dives, then the study material: that is the whole shape of the site. Keep the navigation that simple.
+Overview first, then three deep dives, then the study material and the tools: that is the whole shape of the site. Keep the navigation that simple.
 
 ## Keep the deep dives free of overlap
 
@@ -41,6 +41,16 @@ In practice:
 The site points readers to material in which they can see the ideas at work, made by Flock engineers: at the moment a code repository and a workshop. The material lives in the "Study material" section (`docs/study-material/`): an index page that lists every item in a sentence, and one page per item that explains what it is, who made it, what it shows and where to look, and how to get or run it. Those pages describe the material and link to the deep dives for the ideas; they never explain a pillar again.
 
 Two places point into the section and say no more than needed. The overview page lists the items in a sentence each, with the pillars they show. A deep dive may list, under a "Study material" heading at the end, only the material that shows its own pillar, with a sentence or two on what to look for in it, linking to the item's page. Don't list material in a deep dive whose pillar it does not show. Describe material from what it actually contains, so check it before you write about it.
+
+## Tools
+
+The Tools section (`docs/tools/`) has one page per tool that Flock built to put a pillar into practice: Wirespec for Specified contracts, KMapper for Domain isolation. It is not a fourth pillar. The section supports the pillars and stays out of the overview.
+
+- **Every tool page names the pillar it serves** and links to that deep dive.
+- **The link runs one way.** The overview and the deep dives never name a tool, not even in passing: the ideas stand on their own, and a reader of "Specified contracts" must not find Wirespec there. That includes the study material listed at the end of a deep dive: say what the material shows without naming the tool it uses. Pillars link to pillars, tools link to pillars.
+- **Study material pages may name a tool**, since they describe what a repository or a workshop is built with. Link the first mention to the tool's page.
+- **A tool page explains what the tool is, what it brings and where it fits.** Installation and usage detail belongs on the tool's own site, which the page links to.
+- **A new tool gets a page of its own** in `docs/tools/`, with a `slug` under `/tools/`, and an entry in the list on the section's index page.
 
 ## Audience and tone
 

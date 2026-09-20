@@ -75,7 +75,7 @@ const config = {
           alt: '',
           src: 'img/logo.svg',
         },
-        // Plain links, so only the pillar you are reading is highlighted
+        // Plain links, so only the section you are reading is highlighted
         items: [
           {
             to: '/specified-contracts',
@@ -96,6 +96,11 @@ const config = {
             to: '/study-material',
             position: 'right',
             label: 'Study material',
+          },
+          {
+            to: '/tools',
+            position: 'right',
+            label: 'Tools',
           },
         ],
       },
@@ -122,6 +127,9 @@ const config = {
             title: 'Flock',
             items: [
               {label: 'flock.community', href: 'https://flock.community'},
+              // The tools are named only inside their own section, so the
+              // pillar pages never carry a tool's name, not even in the footer.
+              {label: 'Tools', to: '/tools'},
             ],
           },
         ],
