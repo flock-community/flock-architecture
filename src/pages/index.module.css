@@ -130,41 +130,65 @@
   line-height: 1.6;
 }
 
-/* An arrow, not words: the same sentence under all three pillars reads as
-   repetition. Screen readers still get the sentence, with the pillar's name. */
+/* Each link names what its deep dive covers, because one sentence repeated
+   under all three pillars reads as filler. The line under it has the colour
+   that is lit in the pillar's picture, and fills the link on hover. */
 .deepDive {
-  display: grid;
-  place-items: center;
+  --role: var(--ov-turquoise);
+
+  position: relative;
+  z-index: 0;
   align-self: flex-start;
-  width: 3rem;
-  height: 3rem;
   margin-top: auto;
-  background: var(--ov-turquoise);
-  color: #070908;
-  transition: background-color 120ms ease-out;
+  padding: 0.3rem 0 0.5rem;
+  color: #fff;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  font-stretch: 112%;
+  line-height: 1.3;
+  text-decoration: none;
 }
 
-.deepDive svg {
-  width: 1.375rem;
-  height: 1.375rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.25;
-  stroke-linecap: square;
+.deepDive[data-role='inside'] {
+  --role: var(--ov-yellow);
+}
+
+.deepDive[data-role='between'] {
+  --role: #fff;
+}
+
+.deepDive::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--role);
 }
 
 .deepDive:hover {
-  background: var(--ov-yellow);
   color: #070908;
+  text-decoration: none;
+}
+
+.deepDive:hover::before {
+  right: -0.5rem;
+  left: -0.5rem;
+  height: 100%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .deepDive svg {
-    transition: transform 120ms ease-out;
+  .deepDive {
+    transition: color 140ms ease-out;
   }
 
-  .deepDive:hover svg {
-    transform: translateX(3px);
+  .deepDive::before {
+    transition:
+      right 140ms ease-out,
+      left 140ms ease-out,
+      height 140ms ease-out;
   }
 }
 

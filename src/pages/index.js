@@ -11,6 +11,7 @@ const PILLARS = [
     title: 'Specified contracts',
     to: '/specified-contracts',
     highlight: 'edge',
+    deepDive: 'How contracts work',
     essence: 'Write down what you promise the outside world.',
     body: (
       <>
@@ -27,6 +28,7 @@ const PILLARS = [
     title: 'Domain isolation',
     to: '/domain-isolation',
     highlight: 'inside',
+    deepDive: 'Where the boundaries go',
     essence: 'Keep the heart of the business free of everything else.',
     body: (
       <>
@@ -43,6 +45,7 @@ const PILLARS = [
     title: 'Event-driven',
     to: '/event-driven',
     highlight: 'between',
+    deepDive: 'What events give you',
     essence: 'Record what happened, not only how things are now.',
     body: (
       <>
@@ -56,7 +59,7 @@ const PILLARS = [
   },
 ];
 
-function Pillar({title, to, highlight, essence, body}) {
+function Pillar({title, to, highlight, deepDive, essence, body}) {
   return (
     <article className={styles.pillar}>
       <PillarGlyph highlight={highlight} className={styles.pillarGlyph} />
@@ -65,11 +68,8 @@ function Pillar({title, to, highlight, essence, body}) {
       </Heading>
       <p className={styles.pillarEssence}>{essence}</p>
       <p className={styles.pillarBody}>{body}</p>
-      <Link className={styles.deepDive} to={to}>
-        <span className={styles.srOnly}>Read the deep dive on {title}</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 12h14M13 6l6 6-6 6" />
-        </svg>
+      <Link className={styles.deepDive} data-role={highlight} to={to}>
+        {deepDive}
       </Link>
     </article>
   );
