@@ -66,7 +66,10 @@ function Pillar({title, to, highlight, essence, body}) {
       <p className={styles.pillarEssence}>{essence}</p>
       <p className={styles.pillarBody}>{body}</p>
       <Link className={styles.deepDive} to={to}>
-        Read the deep dive<span className={styles.srOnly}> on {title}</span>
+        <span className={styles.srOnly}>Read the deep dive on {title}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 12h14M13 6l6 6-6 6" />
+        </svg>
       </Link>
     </article>
   );
