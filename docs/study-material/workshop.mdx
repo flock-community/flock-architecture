@@ -1,0 +1,54 @@
+---
+title: 'Workshop: Pragmatic Functional Programming in Kotlin'
+sidebar_label: The workshop
+description: A hands-on workshop by Jerre van Veluw in which you take an existing application and isolate its domain step by step.
+slug: /study-material/workshop
+sidebar_position: 2
+---
+
+# Workshop: Pragmatic Functional Programming in Kotlin
+
+[Pragmatic Functional Programming in Kotlin](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/) is a hands-on workshop by Jerre van Veluw, software engineer at Flock. It is given at Kotlin Dev Day, the Kotlin conference in Amsterdam, as one of the workshops on the day before the conference, and Flock gives it in-house as well. In one day you take an existing application and isolate its domain, step by step, until the business rules sit in a module of their own that depends on nothing, with the technology around them.
+
+- **Where:** the [workshop page at Kotlin Dev Day](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/) has the next date and tickets.
+- **Given by:** Jerre van Veluw, software engineer at Flock.
+- **Format:** a full day of hands-on work on code.
+- **Built with:** Kotlin, Spring Boot, Arrow and Maven.
+- **Shows:** [Domain isolation](/domain-isolation).
+
+## What it is about
+
+Most applications don't start out with an isolated domain. The business rules grow where they are first needed: in a controller, next to the database code, inside a framework's conventions. That works, until the day the framework has to be upgraded, the database replaced or a rule changed, and every change touches everything. [Domain isolation](/domain-isolation) is the answer, but reading about it is not the same as doing it on code that already exists.
+
+That is what the workshop is for. You start from an application in the state most applications are in and move it, step by step, to the state the [pragmatic repository](/study-material/pragmatic) is in. The steps are small, and each one leaves the application working.
+
+## How it goes
+
+The workshop describes its approach as steps to isolate your domain, and has you carry them out.
+
+1. **Modularise the domain logic.** Move the domain classes and the business rules into a module of their own, free of external dependencies. Other modules may depend on that module; it depends on none of them. This is the principle of hexagonal architecture: the business in the middle, the technology around it, and every dependency pointing inwards.
+2. **Find the breaking points.** Compile, and see where the build breaks. Typically it is the repository code, the part that talks to the database, which could reach into the business logic before and now can't. Each break marks a place where technology and business had grown together. You resolve them one by one, so that each concern ends up in exactly one place.
+
+What you take home is a recipe you can repeat on your own codebase, and a feel for how much of an application's code was never about the business at all.
+
+## The functional half
+
+The other half of the workshop is the pragmatic functional programming of its title, with the [Arrow](https://arrow-kt.io/) library. Functional programming here is not a different way of writing everything, but a few techniques that keep an isolated domain honest: an operation that can fail says so in its type and returns the error as a value, so that nothing is thrown past the boundary, and data is checked once, at the edge, so that inside the domain it is always valid. The [pragmatic repository](/study-material/pragmatic) shows what these look like in finished code.
+
+## Who it is for
+
+The workshop is for engineers who build back-end services in Kotlin and have a codebase in which the domain and the technology have grown together, which is most codebases. For a manager, the useful facts are these: it takes one day, people work on code rather than listen to slides, and they come back with a way of working they can start applying the next morning.
+
+## How it relates to this site
+
+The [Domain isolation](/domain-isolation) deep dive explains why the domain should depend on nothing and everything should depend on it. The workshop is where you do that to a real application. The [pragmatic repository](/study-material/pragmatic) is what the finished shape looks like, so it is worth reading either before the workshop, to know where you are heading, or after it, to compare.
+
+Jerre van Veluw also gave a talk of the same name at Kotlin Dev Day in 2022, which is [recorded on YouTube](https://www.youtube.com/watch?v=Qnh4BTvg5Bs). It is the shortest introduction to the ideas behind the workshop.
+
+## About the trainer
+
+Jerre van Veluw is a software engineer at Flock. He has worked for clients such as bol.com, ING and DHL, building back-end web services and front-ends, and he wrote the pragmatic repository. He speaks about these ideas at conferences such as Kotlin Dev Day and Devoxx.
+
+## Taking part
+
+The workshop runs on the workshop day of Kotlin Dev Day, in Amsterdam. The [workshop page](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/) has the date of the next edition and the tickets. Flock also gives the workshop itself, in a longer two-day form at its office in Utrecht. For an edition for your team, contact [Flock](https://flock.community).

@@ -60,13 +60,13 @@ const PILLARS = [
   },
 ];
 
-// Material in which the ideas can be seen at work. `shows` names the pillars
-// it covers, by their path.
+// Material in which the ideas can be seen at work, each with a page in the
+// study material section. `shows` names the pillars it covers, by their path.
 const REFERENCES = [
   {
     kind: 'Code on GitHub',
     title: 'The pragmatic repository',
-    href: 'https://github.com/flock-community/pragmatic',
+    to: '/study-material/pragmatic',
     shows: ['/specified-contracts', '/domain-isolation'],
     body: (
       <>
@@ -80,7 +80,7 @@ const REFERENCES = [
   {
     kind: 'Hands-on workshop',
     title: 'Pragmatic Functional Programming in Kotlin',
-    href: 'https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/',
+    to: '/study-material/workshop',
     shows: ['/domain-isolation'],
     body: (
       <>
@@ -110,13 +110,13 @@ function Pillar({title, to, highlight, deepDive, essence, body}) {
   );
 }
 
-function Reference({kind, title, href, shows, body}) {
+function Reference({kind, title, to, shows, body}) {
   const pillars = shows.map((to) => PILLARS.find((pillar) => pillar.to === to));
   return (
     <article className={styles.reference}>
       <p className={styles.referenceKind}>{kind}</p>
       <Heading as="h3" className={styles.referenceTitle}>
-        <Link href={href}>{title}</Link>
+        <Link to={to}>{title}</Link>
       </Heading>
       <p>{body}</p>
       <p className={styles.referenceShows}>
@@ -227,11 +227,12 @@ export default function Home() {
             </Heading>
             <p className={styles.referencesLead}>
               Two places to see the ideas at work, both made by engineers at
-              Flock.
+              Flock. The <Link to="/study-material">study material section</Link>{' '}
+              has a page on each.
             </p>
             <div className={styles.referenceGrid}>
               {REFERENCES.map((reference) => (
-                <Reference key={reference.href} {...reference} />
+                <Reference key={reference.to} {...reference} />
               ))}
             </div>
           </div>
