@@ -4,7 +4,7 @@
 
 /**
  * One sidebar, generated from the docs folder: a "Three pillars" section with
- * a deep dive per pillar, then the "Study material" section.
+ * a deep dive per pillar, then the "Study material" and "Tools" sections.
  *
  * @type {import('@docusaurus/plugin-content-docs').SidebarsConfig}
  */

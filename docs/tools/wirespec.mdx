@@ -1,0 +1,64 @@
+---
+title: Wirespec
+description: A small language for writing down the contract of an interface, and a compiler that turns the contract into code.
+slug: /tools/wirespec
+sidebar_position: 1
+---
+
+# Wirespec
+
+[Wirespec](https://wirespec.io) is a small language for writing down the contract of an interface, and a compiler that turns that contract into code. It is open source, built and maintained by Flock, and it belongs with the [Specified contracts](/specified-contracts) pillar: it is the tool we use to put that idea into practice.
+
+## What it is
+
+A Wirespec file describes an interface in a handful of building blocks: the **types** that travel over the wire, the **endpoints** that accept them and what each endpoint answers, and **channels** for messages that are sent rather than requested. There is little more to the language than that, and a file with a few of each is a complete contract.
+
+```wirespec title="todos.ws"
+type Todo {
+    id: Integer,
+    task: String,
+    done: Boolean
+}
+
+endpoint GetTodos GET /todos -> {
+    200 -> Todo[]
+}
+
+endpoint CreateTodo POST Todo /todos -> {
+    201 -> Todo
+    400 -> Error
+}
+
+type Error {
+    reason: String
+}
+```
+
+This file says that a to-do has an identifier, a task and a done flag; that a list of them can be fetched from `/todos`; and that a new one can be sent to the same address, which answers either with the created to-do or with an error. Anyone can read it, including people who never write code, and it names everything the two sides need to agree on.
+
+From such a file the Wirespec compiler generates code in the language of each party: Kotlin, Java, TypeScript and Python, among others. The generated code holds the types and, for each endpoint, its request and every response it can give, in a form that the compiler of that language checks. It depends on no library or framework, so it fits into any project and outlives the frameworks around it. Wirespec plugs into the usual build tools, Maven, Gradle and npm, and into IntelliJ IDEA and Visual Studio Code. There is also an online [playground](https://playground.wirespec.io) to try it in.
+
+## Where it fits: Specified contracts
+
+[Specified contracts](/specified-contracts) is about making the promises a system makes to the outside world explicit: written down, versioned and shared, so that everyone knows what is safe to change. A Wirespec file is that explicit promise. It is the contract itself, in a form that both people and compilers can read.
+
+Two things follow from generating the code instead of writing it by hand:
+
+- **The contract can't drift from the code.** The code that speaks the interface is generated from the specification, so it can't quietly diverge from it. When the contract changes, the generated code changes with it, and everything built on that code either still compiles or shows exactly where it broke.
+- **Both sides work from the same file.** The team that provides an interface and the teams that consume it generate their code from one specification. A change to the contract is visible to every consumer at once, before anything is deployed.
+
+Wirespec's own documentation calls this *contract-first*: writing the specification before the code. That order is the natural one for a new interface, but it isn't what the pillar hinges on. What matters is that a specification exists and is the source of truth, and Wirespec serves an existing interface just as well. It converts an OpenAPI description into a Wirespec file, so that an interface that grew without a contract gets one after the fact, and it produces OpenAPI from a Wirespec file for the tools that expect that format.
+
+## What it brings
+
+- **A contract that non-programmers can read.** A product owner or a manager can read a Wirespec file and check that it says what was agreed.
+- **One source of truth for an interface**, independent of any language, with generated code that is guaranteed to match it.
+- **Less repetitive work.** The types and the plumbing for every request and response are generated, so engineers write only the behaviour behind the interface.
+- **Early warning when a change breaks someone.** Consumers find out when they compile, not when they deploy.
+- **A basis for testing.** The specification can drive mock servers and test data, so an implementation can be checked against the contract it claims to follow.
+
+## Where to go next
+
+- [wirespec.io](https://wirespec.io), with the language reference, the plugins and the integrations.
+- The [source code](https://github.com/flock-community/wirespec) on GitHub, under the Apache 2.0 licence.
+- The [playground](https://playground.wirespec.io), to write a specification and see the generated code side by side.

@@ -1,0 +1,65 @@
+---
+title: KMapper
+description: A Kotlin compiler plugin that writes the code that translates between a domain model and the models around it.
+slug: /tools/kmapper
+sidebar_position: 2
+---
+
+# KMapper
+
+[KMapper](https://github.com/flock-community/kmapper) is a plugin for the Kotlin compiler that writes the code that translates one class into another. It is built by Flock, and it belongs with the [Domain isolation](/domain-isolation) pillar: it is the tool we use to make that idea cheap to keep.
+
+## What it is
+
+Software that keeps its models apart has to translate between them. The same customer exists as a domain object, as a database row and as the message that goes over the wire, and code has to carry the values from one to the other. Written by hand, that code is dull and easy to get wrong: a field added to one class is forgotten in the translation, and nobody notices until a value goes missing at runtime.
+
+KMapper turns the translation into a few lines. You call `mapper` on the object you have, name the class you want, and describe only the fields that differ. Everything that matches by name is carried over on its own.
+
+```kotlin
+data class User(
+    val id: Int,
+    val firstName: String,
+    val lastName: String,
+    val age: Int,
+    val active: Boolean
+)
+
+data class UserDto(
+    val id: Int,
+    val name: String,
+    val age: String,
+    val active: Boolean = false
+)
+
+val user = User(1, "John", "Doe", 99, true)
+
+val userDto: UserDto = user.mapper {
+    name = "${it.firstName} ${it.lastName}"
+    age = it.age.toString()
+    active.ignore()
+}
+```
+
+The first two blocks are two classes that describe a user for two different purposes. The last block turns one into the other. The identifier is carried over because both classes have a field of that name, the name is composed out of two fields, the age changes type, and one field is deliberately skipped so that its default value applies.
+
+The work happens while the code is compiled, and that is what sets KMapper apart. The plugin replaces the `mapper` call with the plain construction of the target object, so there is nothing to look up at runtime and nothing slower than the code you would have written yourself. And the compiler checks the mapping: if the target class needs a field that neither matches a source field nor is described in the block, the code doesn't compile. Nested classes, lists, optional fields, default values, enumerations with the same entries and identifier types that wrap a plain value are all handled without extra instructions.
+
+## Where it fits: Domain isolation
+
+[Domain isolation](/domain-isolation) keeps the part of the software that captures the business separate from the technology around it. The domain model, the database model and the interface model are three different things, each changing for its own reasons, and the price of keeping them apart is the code that maps between them. That price is what KMapper lowers. The mapping stays: each model still has its own class, and each still changes on its own. What goes is most of the writing, and the checking moves to the compiler. When a model gains a field, the build fails at the mapping that no longer covers it, instead of a value silently going missing.
+
+Two details matter for keeping the domain clean:
+
+- **The mapping lives outside the domain.** A `mapper` call belongs in the code that talks to the database or answers a request, not in the domain model. The domain keeps no dependency on KMapper, just as it keeps none on a database or a framework.
+- **Identifiers keep their own type.** The deep dive recommends giving each identifier a type of its own, so that a shipment's identifier can't end up where an order's is expected. KMapper wraps and unwraps such types on its own, so the domain can use them while a database row or a message carries the plain value.
+
+## What it brings
+
+- **The usual excuse for one class doing three jobs disappears.** Putting the business concept, the database row and the message on one class is tempting because mapping between three classes is work. With the mapping generated, that argument is gone.
+- **Mistakes surface at compile time.** A mapping that no longer matches its models is a build error, not a production incident.
+- **No runtime cost and no magic.** The generated code is what an engineer would have written by hand, and it can be read as such.
+- **Mapping code that fits on a screen**, which says only what is different between two models.
+
+## Where to go next
+
+- The [source code and documentation](https://github.com/flock-community/kmapper) on GitHub, with the current requirements, installation instructions and the full list of what is mapped automatically. KMapper is young and under active development, so check there for its current state.
