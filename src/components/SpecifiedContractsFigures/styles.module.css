@@ -1,0 +1,203 @@
+/*
+ * Figures inside a deep dive sit on a square-cornered plate, like the rest of
+ * the page. Circles belong to the picture.
+ */
+.figure {
+  --f-ink: var(--ifm-font-color-base);
+  --f-muted: #5c6866;
+  --f-line: #7d8a88;
+  --f-disc: var(--fa-yellow);
+  --f-disc-stroke: #0d0e0d;
+  /* Anything drawn on a disc is on yellow in both colour modes */
+  --f-on-disc: #0d0e0d;
+  /* The contract. Turquoise is too light on a white plate, so a deep teal there */
+  --f-edge: #0a8f88;
+
+  margin: 2rem 0;
+  padding: 1.5rem 1.25rem 1.25rem;
+  border: 1px solid var(--ifm-toc-border-color);
+  background: var(--ifm-background-surface-color);
+}
+
+:global([data-theme='dark']) .figure {
+  --f-muted: #a9b5b3;
+  --f-line: #6f7d7b;
+  --f-disc-stroke: transparent;
+  --f-edge: var(--fa-turquoise);
+}
+
+.caption {
+  max-width: 36rem;
+  margin: 1.1rem auto 0;
+  color: var(--f-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Drawn at its own size on a wide page, never blown up */
+.versions {
+  max-width: 28rem;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.panelTitle {
+  margin: 0 0 0.75rem;
+  color: var(--f-muted);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.disc {
+  fill: var(--f-disc);
+  stroke: var(--f-disc-stroke);
+  stroke-width: 1.5;
+}
+
+.discLabel {
+  fill: var(--f-on-disc);
+  font-size: 15px;
+  font-weight: 650;
+  text-anchor: middle;
+}
+
+/* What is inside a domain */
+.parts line {
+  stroke: var(--f-on-disc);
+  stroke-width: 1.25;
+  opacity: 0.55;
+}
+
+.parts rect {
+  fill: var(--f-disc);
+  stroke: var(--f-on-disc);
+  stroke-width: 1.5;
+}
+
+/* The contract around a domain, and the places where the outside connects */
+.ring {
+  fill: none;
+  stroke: var(--f-edge);
+  stroke-width: 3;
+}
+
+.ports circle {
+  fill: var(--f-edge);
+}
+
+.box {
+  fill: none;
+  stroke: var(--f-line);
+  stroke-width: 1.5;
+}
+
+.boxLabel {
+  fill: var(--f-ink);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.arrow line,
+.reach {
+  stroke: var(--f-ink);
+  stroke-width: 1.75;
+}
+
+.arrow polygon {
+  fill: var(--f-ink);
+}
+
+.arrow.onDisc line {
+  stroke: var(--f-on-disc);
+}
+
+.arrow.onDisc polygon {
+  fill: var(--f-on-disc);
+}
+
+/* A version of a contract over time */
+.band {
+  fill: var(--f-edge);
+}
+
+.band.old {
+  opacity: 0.4;
+}
+
+.bandStop {
+  stop-color: var(--f-edge);
+}
+
+.rowLabel {
+  fill: var(--f-ink);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.span polyline {
+  fill: none;
+  stroke: var(--f-line);
+  stroke-width: 1.25;
+  stroke-dasharray: 4 4;
+}
+
+.span text,
+.moments text {
+  fill: var(--f-ink);
+  font-size: 15px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.moments circle {
+  fill: var(--f-ink);
+}
+
+.callout line {
+  stroke: var(--f-line);
+  stroke-width: 1.25;
+}
+
+.callout circle {
+  fill: var(--f-ink);
+}
+
+.callout circle.onDisc {
+  fill: var(--f-on-disc);
+}
+
+.callout text {
+  fill: var(--f-ink);
+  font-size: 15px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+@media (max-width: 640px) {
+  .figure {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .panels {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+  }
+}
