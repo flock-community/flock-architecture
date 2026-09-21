@@ -9,53 +9,27 @@ import {EdgeFigure, VersionsFigure} from '@site/src/components/SpecifiedContract
 
 # Specified contracts
 
-Every system that other people use has a contract. Maybe nobody wrote it down, but it is there. As soon as a web app, another team or a customer calls your software, there is an agreement about what goes over the wire: what you can ask, and what comes back, in which shape.
+Every system that other people use has a contract: an agreement about what goes over the wire, what you can ask, and what comes back, in which shape. If nobody wrote it down, the contract is whatever your system happens to do today.
 
-If nobody wrote that agreement down, the contract is whatever your system happens to do today. Everyone who depends on you had to figure it out by trial and error.
+A specified contract is the same agreement, but explicit and looked after:
 
-A specified contract is the same agreement, but explicit and looked after. It comes down to three things:
-
-1. **Write it down.** There is a specification of everything that crosses the edge of your system. Precise enough for a machine to check, plain enough to discuss with the people on the other side.
-2. **Keep it thin.** It contains what those people need, and nothing about how the inside works.
-3. **Change it in versions.** A change is a decision, with a version number and an announcement. An old version is retired on a date, not overnight.
-
-In this deep dive we go through these three. After that we look at what a specification can't capture, at the signs that a contract was never written down, and at how far you should take all of this.
+1. **Write it down.** A specification describes everything that crosses the edge of your system, for machines to check and people to discuss.
+2. **Keep it thin.** It contains what the other side needs, and nothing about how the inside works.
+3. **Change it in versions.** A change is a decision with a version number and an announcement, and an old version is retired on a date.
 
 ## The contract you already have
 
-Let's take the web shop from the [overview](/). Shipping knows where every parcel is. The frontend, the website that customers see, shows it to them. Checkout asks for it now and then. And a partner that sells the shop's products on its own site reads it to keep its customers informed.
+Take the web shop from the [overview](/). The frontend and a partner's website both show customers where their parcel is. Both get it from Shipping, and neither can look inside. They see its **interface**: what can be called, and what comes back. Nobody signed anything, but that is a contract. Shipping, the **provider**, offers data in a certain shape, and the **consumers** on the other side expect it to stay that way.
 
-None of them can look inside Shipping. What they see is Shipping's **interface**: the part the outside world can call, and what comes back. A number of fields, with certain names, in a certain format.
-
-That is a contract, in the technical sense of the word. Nobody signed anything, but there is an agreement all the same. Shipping offers data in a certain shape, and the software on the other side expects it to stay that way. On this page we call the side that offers the **provider**, and the sides that use it the **consumers**.
-
-As long as the agreement is implicit, a consumer learns it by looking. It sends a request, sees what comes back and builds on that. On all of it, because nothing says which parts are a promise and which parts are there by accident.
-
-The provider, on the other hand, has no idea what people rely on. Fix a mistake in a field, add a feature, drop data you no longer keep: every change touches people you can't name. So you either make the change and find out afterwards who broke, or you stop making changes. Neither is a good option.
+While the agreement is implicit, a consumer builds on everything it sees, because nothing says which parts are a promise and which are there by accident. The provider has no idea what people rely on. It either changes things and finds out afterwards who broke, or it stops changing things.
 
 <EdgeFigure />
 
-### Where a contract belongs
-
-A contract belongs at the edge: every place where something crosses from the inside of a system to the outside world. In the picture on the [overview](/) that is the ring around a circle, and the ports on the ring are the only places where the outside connects.
-
-You recognise an edge by one thing: the two sides are built and released separately. For example:
-
-- between a frontend and its backend, the part of an application that runs on the server;
-- between the services of two teams;
-- between you and a third party, in both directions: the interface you offer and the one you use.
-
-How the data travels doesn't matter. A request over the web, a message on a queue and a file in a shared folder all carry data in an agreed shape, so all of them belong in the contract. The same goes for every kind of message: a question, an instruction, or a report that something happened.
-
-Everything that can be reached from outside is part of the contract, written down or not. So nothing should be reachable that isn't in it. In particular, there should be no way around the edge and straight into the database. [Domain isolation](/domain-isolation#contexts-do-not-overlap) rules that out for its own reasons.
-
-Inside one codebase the compiler does this job for you. The compiler is the program that checks your code before it runs. Change what a function expects, and it points at every place that calls it. Across the edge, none of that works. The other side is built somewhere else, released on someone else's schedule, and you may not even know who they are. A specification does for the edge what the compiler does inside the code: it states what both sides may expect, in a form that can be checked.
+A contract belongs at the edge: wherever the two sides are built and released separately, whether what crosses it is a web request, a message on a queue or a file. And nothing should be reachable that isn't in it, least of all the database. [Domain isolation](/domain-isolation#contexts-do-not-overlap) rules that out for its own reasons.
 
 ## Write it down
 
-A specification is a document that describes the contract in a formal language. It lists the **operations**: the things a consumer can ask for. For each operation it gives the data that goes in and comes out, the type of every field, which fields may be missing and which errors can come back.
-
-To give you an idea, here is a part of Shipping's contract in OpenAPI, the most widely used language for describing web interfaces:
+A specification lists the **operations** a consumer can ask for, with what goes in and comes out, down to the type of every field and the errors that can come back. Here is part of Shipping's contract in OpenAPI, the most widely used language for web interfaces:
 
 ```yaml title="From Shipping's contract, in OpenAPI"
 ShipmentResponse:
@@ -64,7 +38,6 @@ ShipmentResponse:
   properties:
     id:
       type: string
-      format: uuid
     status:
       type: string
       enum: [PREPARING, IN_TRANSIT, DELIVERED]
@@ -73,207 +46,56 @@ ShipmentResponse:
       format: date
 ```
 
-In words: a shipment always has an identifier and a status, the status is one of three values, and there may be an expected delivery date. Another part of the document says that you get a shipment by asking for `/shipments/` followed by its identifier, and that the answer is "not found" when it doesn't exist.
+In words: a shipment always has an identifier and one of three statuses, and may have an expected delivery date. Which language you use is a tooling decision. That you use one is the architectural decision.
 
-The language matters less than having one. Besides OpenAPI there is AsyncAPI for messaging, Protocol Buffers and Avro for compact binary data, and GraphQL has a schema language of its own. Which one you use is a tooling decision. That you use one is the architectural decision.
-
-Two things make such a document more than documentation.
-
-**It doesn't depend on a programming language.** So you can put it in front of both parties. The team on the other side, the business and a partner's engineers can all read it and discuss it, without reading your code. A contract is something you negotiate, and this document is what you negotiate about.
-
-**A machine can read it.** So the promise can be checked instead of trusted:
-
-- **Generate.** Tools turn the specification into code: for the provider the interfaces it has to implement, for a consumer a ready-made client, each in the language that side uses. An implementation that drifts from the contract doesn't compile anymore.
-- **Verify.** Where nothing is generated, tests can check every response against the specification.
-- **Compare.** Two versions of a specification can be compared automatically. The comparison tells you whether consumers on the old version still fit, so a breaking change that nobody announced is caught before it ships.
-- **Stand in.** A consumer can build against a fake provider that follows the specification, before the real one exists.
+Such a document is independent of any programming language, so the other team and the business can read it and negotiate about it. And a machine can read it, so the promise is checked instead of trusted: tools generate both sides' code from it, and two versions can be compared, so an unannounced breaking change is caught before it ships.
 
 ### Specified, not first
 
-There is an old debate about what comes first: the specification or the code. *Contract first* means you write the specification by hand and generate code from it. *Code first* means you write the code and derive the specification from it.
+*Contract first* means you write the specification and generate code from it. *Code first* means you write the code and derive the specification from it. We deliberately don't call this pillar "contract first", because the order is not the point. What matters is that a specification exists and is treated as the contract: kept under version control, reviewed as a change to a promise, and what you point consumers to. A specification generated on the fly from whatever the code does today is not a contract.
 
-We deliberately don't call this pillar "contract first", because the order is not the point. The point is that a specification exists and is treated as the contract. It is kept under version control next to the code, so every change to it is on record. A change is reviewed as a change to a promise. And it is what you point consumers to.
-
-Either route works, as long as a specification derived from the code is stored with the code too. What doesn't work is a specification generated on the fly from whatever the code looks like today, and read by nobody. Then the code is the contract and the document only reports on it. Rename a field during a clean-up, and you have quietly changed a promise.
-
-We don't prescribe an order of work either. How your team gets to a good result is up to your team, and it depends on the situation:
-
-- **You don't know the domain yet.** Then the contract follows. It's hard to decide what to promise about a business you don't understand. That is why Domain isolation argues for [starting with the domain](/domain-isolation#start-with-the-domain).
-- **You connect someone to a domain that already exists.** Then the contract does come first. Negotiate it before any data flows. The worst start is to share something informally, "just for now". The other side builds on it, and the accident becomes the contract.
-- **You replace a system that has consumers.** Then the contract comes first too. It is the one part that has to survive. If nobody ever wrote it down, recover it: find out what is really called and what is really used, write that down, and build the new system against it.
+When you connect someone to an existing domain, negotiate the contract before any data flows, because whatever you share "just for now" becomes the contract.
 
 ## Keep it thin
 
-An interface is thin. An implementation is heavy. Behind a handful of operations sit the domain model, the database, the integrations and years of decisions. The contract is a thin shell around all of that, and everything that follows depends on it staying thin.
-
-### Slow outside, fast inside
-
-Software never stops changing, but not all of it changes at the same speed. Behind the contract your team decides alone, and can release many times a day. At the edge every change involves other people, with plans and release dates of their own. That is slow by nature. And it would be just as slow without a contract: an interface is slow to change because it has consumers, not because you wrote down what they rely on.
-
-Writing it down decides whether slow becomes stuck. When nobody knows what is relied on, nothing can be touched safely. The interface freezes, and the system behind it freezes with it. With a contract you know exactly what you have to keep supporting, and what you agreed with whom. Everything else is free to change whenever the business asks for it.
-
-A nice consequence: the only version number that matters is the contract's. The implementation behind it can go out fifty times a week, with nothing more than a build number. As long as every build honours the contract, in shape and in [behaviour](#what-a-specification-cant-hold), you can replace it whenever you want.
+An interface is thin. An implementation is heavy. And the two change at different speeds: behind the contract your team decides alone and can release many times a day, while at the edge every change involves other people with plans of their own. That is slow by nature, with or without a contract. Writing it down decides whether slow becomes stuck. When nobody knows what is relied on, nothing can be touched safely. With a contract you know exactly what you have to keep supporting. Everything else is free to change, as long as every build honours the contract, in shape and in [behaviour](#what-a-specification-cant-hold).
 
 ### Give away as little as you can
 
-Most of the damage is done in the first version of a contract. The quick way to make one is to turn the domain model outward: take each class, add `Dto` to its name (short for data transfer object) and send it over the wire. Some even hand out the database tables. At first this seems free.
+The quick way to make a first version is to turn the domain model outward and send each class over the wire as it is. At first this seems free. But every field you publish is a promise to people you may not know, for a period you don't control. You have to assume they use all of it, so the model can't change shape anymore. The inside has become as slow as the outside.
 
-But every field you publish is a promise to people you may not know, for a period you don't control. You can't see what they use, so you have to assume they use all of it. From that moment the domain model can't change shape without breaking the contract. The inside has become as slow as the outside.
-
-The good news is that adding something to a contract later is easy. Taking something back is hard. So start small. Ask the consumers for the least they can work with. That is version one. Let it grow from there, one request at a time.
-
-```kotlin title="Inside: what Shipping knows about a shipment"
-class Shipment(
-    val id: ShipmentId,
-    val orderId: OrderId,
-    val carrier: Carrier,
-    val carrierRate: Money,
-    val route: List<Hub>,
-    val parcels: List<Parcel>,
-    val status: ShipmentStatus,
-) {
-    fun expectedDelivery(): LocalDate? { … }
-}
-
-enum class ShipmentStatus {
-    ANNOUNCED, LABEL_PRINTED, PICKED, HANDED_OVER,
-    AT_HUB, OUT_FOR_DELIVERY, DELIVERED,
-}
-```
-
-```kotlin title="At the edge: what Shipping promises about it"
-// Generated from the specification
-data class ShipmentResponse(
-    val id: UUID,
-    val status: Status,
-    val expectedDelivery: LocalDate?,
-)
-```
-
-```kotlin title="In between: the only code that knows both"
-import shipping.domain.ShipmentStatus.*
-
-fun Shipment.toResponse() = ShipmentResponse(
-    id = id.value,
-    status = status.toContract(),
-    expectedDelivery = expectedDelivery(),
-)
-
-fun ShipmentStatus.toContract() = when (this) {
-    ANNOUNCED, LABEL_PRINTED, PICKED -> Status.PREPARING
-    HANDED_OVER, AT_HUB, OUT_FOR_DELIVERY -> Status.IN_TRANSIT
-    DELIVERED -> Status.DELIVERED
-}
-```
-
-The consumers asked where a parcel is and when it arrives, and that is what they got. Which carrier takes it, what that costs and which hubs it passes stay inside. Shipping can switch carriers or rework its routing without anyone noticing. The status shows the same thing on a smaller scale: seven steps inside, three promised. Shipping can add an eighth step tomorrow, and all the compiler asks is which of the three it maps to. The functions in between are the mapping that Domain isolation calls [the price of separate models](/domain-isolation#the-price-is-mapping).
-
-The shortcut exists the other way around too. Design the interface first and derive the domain model from it, and the two are tied together just the same.
-
-And if you decide to hand out a lot anyway, say a reporting interface that mirrors your tables, hand it out through a contract. Then at least it has a version, its consumers are known, and you can announce when a part of it goes away.
-
-### What makes a contract wide
-
-- **Internal keys and codes.** Row numbers from the database, internal status codes and the steps of an internal process all tell how the inside works today.
-- **Fields nobody asked for.** "It might come in handy" is a promise nobody asked for.
-- **Nesting that follows the tables.** An answer shaped like the storage breaks when you restructure the storage.
-- **Fingerprints of the technology.** The framework's default error page, or the raw text of an internal error, puts the name of a library into your promise. Errors are part of the contract and deserve a shape of their own.
-- **Names you wouldn't want to keep.** A name in a contract can't change without breaking someone. Working titles and internal abbreviations stay inside.
+Adding to a contract later is easy. Taking something back is hard. So start small: ask the consumers for the least they can work with. Shipping's consumers asked where a parcel is and when it arrives, and that is what they got. Which carrier takes it stays inside, and where a shipment goes through seven steps inside, the contract promises three.
 
 ## Change it in versions
 
-A contract that can't change is as big a problem as one that changes without warning. Versioning lets it change slowly instead of not at all.
+Versioning lets a contract change slowly instead of not at all.
 
 ### Promise more, require less
 
-There are two kinds of changes to a contract. A **compatible** change leaves every existing consumer working. A **breaking** change forces at least one of them to do something.
-
-One rule tells you which is which, and it holds for everything that crosses the edge, requests, answers and messages alike: you may always promise more and require less.
-
-- **In what you offer, more is compatible:** a new operation, a new field in an answer. Less is breaking: a field that is removed or renamed, a type that changes, a field that was always there and may now be missing.
-- **In what you require, less is compatible:** a required field that becomes optional, a new field that may be left out, a wider range of accepted values. More is breaking: a new required field, a stricter check, a value that is no longer accepted.
-
-Engineers will recognise the Liskov substitution principle: the new contract has to work everywhere the old one did.
-
-Version numbers can carry the difference. The convention is called semantic versioning: a compatible change raises the second number, and only a breaking change raises the first. Going from `1.3.0` to `1.4.0` needs nobody's attention. Going to `2.0.0` does. When this page says "a new version", it means a new first number.
-
-The rule only works if consumers keep their side of it, by ignoring what they don't recognise. A consumer that fails on an unknown field turns every addition into a breaking change. This habit is called the **tolerant reader**, and it is the consumer's part of the deal. Be careful with generated code here: many generated clients reject what they don't know until you tell them otherwise.
-
-One case is easy to get wrong: a list of allowed values, like the three statuses above. In what you accept, a fourth value is harmless. In what you send out, it looks like adding, but it is a weaker promise. "One of these three" has become "one of these four", and every consumer that handles each value explicitly, with nothing in place for any other, breaks. So say in the contract whether such a list is closed or may grow. If it may grow, consumers need a fallback for values they don't know.
+A **compatible** change leaves every consumer working. A **breaking** change forces at least one of them to do something. One rule tells you which is which: you may always promise more and require less. A new operation or a new field in an answer is compatible. A field that is removed, renamed or changes type is breaking, and so is a new required field or a stricter check. The rule only works if consumers ignore what they don't recognise, a habit called the **tolerant reader**.
 
 ### Two versions side by side
 
-A breaking change is never made in place. You publish the new version next to the old one, and for a while both work. The old one is marked as **deprecated**: it still works, but it is on its way out. Consumers move over when it suits their own planning, within a period you set. This pattern is called parallel change: add the new next to the old, move everyone over, and only then remove the old.
+A breaking change is never made in place. You publish the new version next to the old one, and for a while both work. The old one is **deprecated**: it still works, but it is on its way out. Consumers move over when it suits their own planning, within a period you set.
 
 <VersionsFigure />
 
-Here a thin contract pays off once more. Because the contract has a model of its own, serving two versions usually means two small mappings from the same domain model, not two systems.
+A useful deprecation says what goes away, when, and what to use instead. Announcing is the easy half. Switching the old version off is the half that gets skipped, and without it interfaces pile up, each costing maintenance and each a door to guard. So save up breaking changes until together they are worth a new version. Events that have been published can't be switched off like an old version. [Event-driven](/event-driven) explains what that asks of their readers.
 
-It still isn't free. Every version that is alive has to be tested, secured, documented and kept working. So keep breaking versions rare: prefer changes that add, and save up the ones that break until together they are worth a new version.
-
-### Retire on a date
-
-A useful deprecation says three things: what goes away, when, and what to use instead. It can apply to a whole version, one operation or a single field. Put it where software sees it as well as people. Most specification languages can mark a part as deprecated. For web interfaces there are also two standard response headers, extra lines that travel with every answer: `Deprecation` says since when an address is deprecated, and `Sunset` says when it stops answering. This way the warning shows up in a consumer's tooling and logs, not only in an email.
-
-A public interface has consumers you will never meet. There the policy itself is part of the promise: how long a version is supported and how changes are announced is stated up front, in the terms of use. That is how you bring strangers along.
-
-Announcing is the easy half. Switching the old version off is the half that gets skipped, and in large organisations it is the hardest part. Without it, interfaces pile up. Each of them costs maintenance and hosting, and each is a door that has to be guarded, including the ones nobody remembers offering. Being able to switch things off is one of the main things a well-kept contract buys you.
-
-Events that have been published can't be switched off like an old version. [Event-driven](/event-driven) explains what that asks of the readers.
-
-### Know who uses what
-
-You can only retire what you can see. Two things make consumers visible.
-
-**Know who they are.** Every consumer gets its own credentials and is registered with a name and a contact, in a catalogue where the contracts are published and consumers sign up for them. No anonymous use, and no shared accounts.
-
-**Measure what they use.** Count the calls per consumer, per version and per operation. Retiring a version is then no longer a guess but a countdown: three consumers are still on version 1, and these are the teams. What is left is a conversation with people you can name.
-
-Counting calls tells you who uses an operation, not which fields they read. Here the consumers can help. With consumer-driven contract tests, each consumer writes down which parts of the contract it relies on, as tests the provider can run. The provider then sees who would break before anything is released, and the question "can we remove this field?" gets an answer.
+You can only retire what you can see, so know your consumers by name and count the calls per consumer, per version and per operation. Retiring a version is then a countdown instead of a guess.
 
 ## What a specification can't hold
 
-A specification captures shapes. Behaviour it captures only partly, and consumers depend on behaviour just as much.
+A specification captures shapes, and consumers depend on behaviour just as much. Say Shipping's list of shipments has always come back in the order they were made, only because the database happened to return them that way, and the frontend shows the last three as "recent deliveries". Then Shipping moves to another database, and customers see parcels from years ago. No tool reports a breaking change, and something broke anyway.
 
-Let's say Shipping offers the list of a customer's shipments, and it has always come back in the order the shipments were made. Nobody decided that; it is how the database happened to return them. The frontend shows the last three as "recent deliveries". Then Shipping moves to another database, the list comes back in another order, and customers see three parcels from years ago. The specification said "a list of shipments" before the move and still says so. No tool reports a breaking change, and something broke anyway.
-
-This is known as Hyrum's Law: with enough consumers, every observable behaviour of a system will be relied on by somebody, whatever the contract says. Order, timing, rounding, the exact wording of an error message: if it can be observed, someone builds on it.
-
-You can do three things about it, and none of them is complete.
-
-- **If a behaviour matters, make it part of the contract.** Do that through the data model. If the order is a promise, give the operation a sort parameter with a stated default. If it is not, say that too, in the name of the field if needed. A list on the wire doesn't say whether it is sorted, so no tool will check this for the consumer, but at least it is no longer guesswork.
-- **As a consumer, rely on what is written and nothing else.** If you read more into a contract than it says, you are making an assumption, and you own the risk.
-- **As a provider, treat a visible change in behaviour as a change to the contract,** and announce it, whatever the comparison tool says. "Compatible" is a statement about shapes.
-
-A contract is never complete. It has to be specific enough that both sides know what they are getting into, and loose enough to leave room to move. But even an incomplete contract draws the line between what was promised and what just happens to be so. Most of the trouble disappears the moment there is a contract at all. So start there.
-
-## Signs of an unwritten contract
-
-The contract on paper and the contract in practice drift apart quietly. Where nothing was ever written, they were never together to begin with. These are the signs:
-
-- consumers find out about a change from their error logs;
-- nobody can answer the question "can we remove this field?";
-- renaming something on the inside changes what goes over the wire;
-- there are fields that no one on the team can explain;
-- a version that was deprecated years ago is still running;
-- a consumer gets its data from something that was never meant as an interface, like a web page, a log file or a table.
-
-## How far to take it
-
-The principle holds from the moment someone else depends on you. How much ceremony it takes depends on who that is.
-
-- **One team owns both sides and releases them together.** Think of a website and the backend made for it, in one repository. A set of types shared by both sides may be all the specification you need, written in the language they have in common. A mobile app is different, even when the same team builds it. Old versions stay on people's phones for years, so to the backend they are outside consumers like any other.
-- **Several teams in one organisation.** A specification in a place everyone can find, version numbers, a list of who uses what and a channel for announcements. This is the common case, and "it's only internal" is no reason to skip it. Internal consumers break just as easily, and in most organisations they are the majority.
-- **A public interface.** All of the above, plus a published policy, a place to sign up, and long retirement periods.
-
-A prototype built to test an idea can do without all of it, until someone builds on it.
+This is Hyrum's Law: with enough consumers, every observable behaviour will be relied on by somebody. So if a behaviour matters, put it in the contract, for example as a sort parameter with a stated default. As a consumer, rely on nothing that isn't written. As a provider, treat a visible change in behaviour as a change to the contract.
 
 ## Conclusion
 
-Every system in use has a contract. The only choice is whether you write it down. A specification describes everything that crosses the edge, in a form people can negotiate about and machines can check. Keep it thin, so that everything behind it can change fast. Promise more and require less; anything else is a new version, which runs next to the old one until the old one retires on a date. And know who uses what, because you can only retire what you can see.
+Every system in use has a contract. The only choice is whether you write it down. A specification describes everything that crosses the edge, in a form people can negotiate about and machines can check. Keep it thin, so that everything behind it can change fast. Promise more and require less. Anything else is a new version, and the old one retires on a date. And know who uses what, because you can only retire what you can see.
 
 Specified contracts are the edge of the circle. [Domain isolation](/domain-isolation) is about what the edge protects, [Event-driven](/event-driven) about what travels from one edge to the next, and the [overview](/) shows how the three depend on each other.
 
 ## Study material
 
-- [The pragmatic repository](/study-material/pragmatic) keeps its contract as a specification, not as a by-product of the code. Look at the `api` module: the whole API is one short file, written in a small language made for writing down what each endpoint accepts and returns, and the endpoints the application implements are generated from that file. The `spi` module does the same in the other direction: the client for a service the application calls is generated from that service's published specification.
+- [The pragmatic repository](/study-material/pragmatic) keeps its contract as a specification. Look at the `api` module: the whole API is one short file, and the endpoints the application implements are generated from it. The `spi` module does the same the other way round, generating a client from another service's specification.
