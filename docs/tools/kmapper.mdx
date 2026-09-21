@@ -7,11 +7,11 @@ sidebar_position: 2
 
 # KMapper
 
-[KMapper](https://github.com/flock-community/kmapper) is a plugin for the Kotlin compiler that writes the code that translates one class into another. It is built by Flock, and it belongs with the [Domain isolation](/domain-isolation) pillar: it is the tool we use to make that idea cheap to keep.
+[KMapper](https://github.com/flock-community/kmapper) is a plugin for the Kotlin compiler that writes the code that translates one class into another. It is built by Flock, and it belongs with the [Domain isolation](/domain-isolation) pillar. It is the tool we use to make that idea cheap to keep.
 
 ## What it is
 
-Software that keeps its models apart has to translate between them. The same customer exists as a domain object, as a database row and as the message that goes over the wire, and code has to carry the values from one to the other. Written by hand, that code is dull and easy to get wrong: a field added to one class is forgotten in the translation, and nobody notices until a value goes missing at runtime.
+Software that keeps its models apart has to translate between them. The same customer exists as a domain object, as a database row and as the message that goes over the wire, and code has to carry the values from one to the other. Written by hand, that code is boring and easy to get wrong. A field added to one class is forgotten in the translation, and nobody notices until a value goes missing at runtime.
 
 KMapper turns the translation into a few lines. You call `mapper` on the object you have, name the class you want, and describe only the fields that differ. Everything that matches by name is carried over on its own.
 
@@ -40,7 +40,7 @@ val userDto: UserDto = user.mapper {
 }
 ```
 
-The first two blocks are two classes that describe a user for two different purposes. The last block turns one into the other. The identifier is carried over because both classes have a field of that name, the name is composed out of two fields, the age changes type, and one field is deliberately skipped so that its default value applies.
+The first two blocks are two classes that describe a user for two different purposes. The last block turns one into the other. The identifier is carried over because both classes have a field with that name, the name is composed out of two fields, the age changes type, and one field is deliberately skipped so its default value applies.
 
 The work happens while the code is compiled, and that is what sets KMapper apart. The plugin replaces the `mapper` call with the plain construction of the target object, so there is nothing to look up at runtime and nothing slower than the code you would have written yourself. And the compiler checks the mapping: if the target class needs a field that neither matches a source field nor is described in the block, the code doesn't compile. Nested classes, lists, optional fields, default values, enumerations with the same entries and identifier types that wrap a plain value are all handled without extra instructions.
 
@@ -51,7 +51,7 @@ The work happens while the code is compiled, and that is what sets KMapper apart
 Two details matter for keeping the domain clean:
 
 - **The mapping lives outside the domain.** A `mapper` call belongs in the code that talks to the database or answers a request, not in the domain model. The domain keeps no dependency on KMapper, just as it keeps none on a database or a framework.
-- **Identifiers keep their own type.** The deep dive recommends giving each identifier a type of its own, so that a shipment's identifier can't end up where an order's is expected. KMapper wraps and unwraps such types on its own, so the domain can use them while a database row or a message carries the plain value.
+- **Identifiers keep their own type.** The deep dive recommends giving each identifier a type of its own, so a shipment's identifier can't end up where an order's is expected. KMapper wraps and unwraps such types on its own, so the domain can use them while a database row or a message carries the plain value.
 
 ## What it brings
 

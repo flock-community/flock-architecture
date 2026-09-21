@@ -7,11 +7,11 @@ sidebar_position: 1
 
 # Wirespec
 
-[Wirespec](https://wirespec.io) is a small language for writing down the contract of an interface, and a compiler that turns that contract into code. It is open source, built and maintained by Flock, and it belongs with the [Specified contracts](/specified-contracts) pillar: it is the tool we use to put that idea into practice.
+[Wirespec](https://wirespec.io) is a small language for writing down the contract of an interface, and a compiler that turns that contract into code. It is open source, built and maintained by Flock, and it belongs with the [Specified contracts](/specified-contracts) pillar. It is the tool we use to put that idea into practice.
 
 ## What it is
 
-A Wirespec file describes an interface in a handful of building blocks: the **types** that travel over the wire, the **endpoints** that accept them and what each endpoint answers, and **channels** for messages that are sent rather than requested. There is little more to the language than that, and a file with a few of each is a complete contract.
+A Wirespec file describes an interface in a handful of building blocks: the **types** that travel over the wire, the **endpoints** that accept them and what each endpoint answers, and **channels** for messages that are sent rather than requested. There is little more to the language than that. A file with a few of each is a complete contract.
 
 ```wirespec title="todos.ws"
 type Todo {
@@ -40,14 +40,14 @@ From such a file the Wirespec compiler generates code in the language of each pa
 
 ## Where it fits: Specified contracts
 
-[Specified contracts](/specified-contracts) is about making the promises a system makes to the outside world explicit: written down, versioned and shared, so that everyone knows what is safe to change. A Wirespec file is that explicit promise. It is the contract itself, in a form that both people and compilers can read.
+[Specified contracts](/specified-contracts) is about making the promises a system makes to the outside world explicit: written down, versioned and shared, so everyone knows what is safe to change. A Wirespec file is that explicit promise. It is the contract itself, in a form that both people and compilers can read.
 
 Two things follow from generating the code instead of writing it by hand:
 
 - **The contract can't drift from the code.** The code that speaks the interface is generated from the specification, so it can't quietly diverge from it. When the contract changes, the generated code changes with it, and everything built on that code either still compiles or shows exactly where it broke.
 - **Both sides work from the same file.** The team that provides an interface and the teams that consume it generate their code from one specification. A change to the contract is visible to every consumer at once, before anything is deployed.
 
-Wirespec's own documentation calls this *contract-first*: writing the specification before the code. That order is the natural one for a new interface, but it isn't what the pillar hinges on. What matters is that a specification exists and is the source of truth, and Wirespec serves an existing interface just as well. It converts an OpenAPI description into a Wirespec file, so that an interface that grew without a contract gets one after the fact, and it produces OpenAPI from a Wirespec file for the tools that expect that format.
+Wirespec's own documentation calls this *contract-first*: writing the specification before the code. That order is the natural one for a new interface, but it isn't what the pillar hinges on. What matters is that a specification exists and is the source of truth, and Wirespec serves an existing interface just as well. It converts an OpenAPI description into a Wirespec file, so an interface that grew without a contract gets one after the fact. And it produces OpenAPI from a Wirespec file for the tools that expect that format.
 
 ## What it brings
 

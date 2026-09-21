@@ -62,6 +62,19 @@ So the site is a high-level explanation of concepts, not a technical manual:
 - Use plain language. Avoid jargon where a normal word works. When a technical term is needed, explain it in a sentence the first time it appears.
 - Keep implementation detail (code, frameworks, configuration) to a minimum. When a concrete example helps, keep it small and say in words what it shows.
 
+## Tone of voice
+
+Write the way an engineer explains something to a colleague: friendly, direct and to the point. The model is the blog posts of Yvonne Ceelie on axoniq.io. The whole site was rewritten to this tone in one go, so any new or changed text has to match it.
+
+- Talk to the reader as "you". Flock is "we": "we deliberately don't call this pillar contract first", not "this pillar is deliberately not called contract first".
+- Open with the problem the reader recognises, then the idea. Bring in one concrete example early (the web shop) and stick with it.
+- Tell the reasoning as a story: "The quick way is X. At first this seems free. But ... So instead ...". A question now and then is fine: "Sounds like a weakness?"
+- Short sentences, short paragraphs, plain words. One idea per paragraph. When in doubt, cut.
+- Active voice. Avoid inversions ("Of the three pillars, this is the one ...") and abstract openers like "It is ... that ...".
+- No Dutch English: no literal translations of Dutch idiom, and no long sentences held together by colons and semicolons.
+- Headings say what the section says, in a few words. A deep dive ends with a short "Conclusion" in plain prose, a few sentences and no list, followed by one sentence that links to the other two pillars and the overview.
+- Link instead of pointing: "[Domain isolation](/domain-isolation) rules that out", not "which is the subject of".
+
 ## Source material
 
 The `transcripts/` folder holds raw, machine-made transcripts of the conversations, held in Dutch, in which these ideas were worked out. They are internal conversations, so the folder is kept out of git: never commit it or quote from it, and expect it to be missing from a fresh checkout. Use the transcripts as input for the ideas and the reasoning, not as text to translate. They are spoken language, they wander between topics, and they contain transcription errors ("Vlok" is Flock, for example).

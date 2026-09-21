@@ -8,7 +8,7 @@ sidebar_position: 2
 
 # Workshop: Pragmatic Functional Programming in Kotlin
 
-[Pragmatic Functional Programming in Kotlin](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/) is a hands-on workshop by Jerre van Veluw, software engineer at Flock. It is given at Kotlin Dev Day, the Kotlin conference in Amsterdam, as one of the workshops on the day before the conference, and Flock gives it in-house as well. In one day you take an existing application and isolate its domain, step by step, until the business rules sit in a module of their own that depends on nothing, with the technology around them.
+[Pragmatic Functional Programming in Kotlin](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/) is a hands-on workshop by Jerre van Veluw, software engineer at Flock. It is given at Kotlin Dev Day, the Kotlin conference in Amsterdam, as one of the workshops on the day before the conference. Flock gives it in-house as well. In one day you take an existing application and isolate its domain, step by step, until the business rules sit in a module of their own that depends on nothing, with the technology around them.
 
 - **Where:** the [workshop page at Kotlin Dev Day](https://kotlindevday.com/program/workshops/workshoppragmatic-functional-programming-in-kotlin/) has the next date and tickets.
 - **Given by:** Jerre van Veluw, software engineer at Flock.
@@ -18,9 +18,9 @@ sidebar_position: 2
 
 ## What it is about
 
-Most applications don't start out with an isolated domain. The business rules grow where they are first needed: in a controller, next to the database code, inside a framework's conventions. That works, until the day the framework has to be upgraded, the database replaced or a rule changed, and every change touches everything. [Domain isolation](/domain-isolation) is the answer, but reading about it is not the same as doing it on code that already exists.
+Most applications don't start out with an isolated domain. The business rules grow where they are first needed: in a controller, next to the database code, inside a framework's conventions. That works, until the day the framework has to be upgraded, the database replaced or a rule changed, and every change touches everything. [Domain isolation](/domain-isolation) is the answer. But reading about it is not the same as doing it on code that already exists.
 
-That is what the workshop is for. You start from an application in the state most applications are in and move it, step by step, to the state the [pragmatic repository](/study-material/pragmatic) is in. The steps are small, and each one leaves the application working.
+That is what the workshop is for. You start from an application in the state most applications are in, and move it step by step to the state the [pragmatic repository](/study-material/pragmatic) is in. The steps are small, and each one leaves the application working.
 
 ## How it goes
 
@@ -33,11 +33,11 @@ What you take home is a recipe you can repeat on your own codebase, and a feel f
 
 ## The functional half
 
-The other half of the workshop is the pragmatic functional programming of its title, with the [Arrow](https://arrow-kt.io/) library. Functional programming here is not a different way of writing everything, but a few techniques that keep an isolated domain honest: an operation that can fail says so in its type and returns the error as a value, so that nothing is thrown past the boundary, and data is checked once, at the edge, so that inside the domain it is always valid. The [pragmatic repository](/study-material/pragmatic) shows what these look like in finished code.
+The other half of the workshop is the pragmatic functional programming of its title, with the [Arrow](https://arrow-kt.io/) library. Functional programming here is not a different way of writing everything. It is a few techniques that keep an isolated domain honest: an operation that can fail says so in its type and returns the error as a value, so nothing is thrown past the boundary, and data is checked once, at the edge, so inside the domain it is always valid. The [pragmatic repository](/study-material/pragmatic) shows what these look like in finished code.
 
 ## Who it is for
 
-The workshop is for engineers who build back-end services in Kotlin and have a codebase in which the domain and the technology have grown together, which is most codebases. For a manager, the useful facts are these: it takes one day, people work on code rather than listen to slides, and they come back with a way of working they can start applying the next morning.
+The workshop is for engineers who build back-end services in Kotlin and have a codebase in which the domain and the technology have grown together. That is most codebases. For a manager, the useful facts are these: it takes one day, people work on code rather than listen to slides, and they come back with a way of working they can start applying the next morning.
 
 ## How it relates to this site
 
