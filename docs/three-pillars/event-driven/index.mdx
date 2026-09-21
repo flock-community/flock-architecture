@@ -31,11 +31,11 @@ An event is a fact. Everything else about a good event follows from that.
 
 **It is named after what happened, in the past tense.** Order placed. Payment received. Parcel handed to carrier. Not "update order", which is an instruction, and not "order changed", which tells the reader nothing. The name is the most important part of an event, because it is what every reader sees first and what everyone talks about: engineers, the business, the dashboard, the report. The names of your events are the vocabulary of the system, and a good one lasts for years.
 
-**It is in the words of the business.** If the people in the warehouse say a parcel is "handed to the carrier", the event is not called `ShipmentDispatched`. The test is simple: read the names of your events out loud to someone from the business. They should nod at every one, and they should be able to say "that's not what we call it". [Domain isolation](/domain-isolation#use-the-words-of-the-business) explains where the words come from.
+**It is in the words of the business.** If the people in the warehouse say a parcel is "handed to the carrier", the event is not called `ShipmentDispatched`. The test is simple: read the names of your events out loud to someone from the business. They should nod at every one, and they should be able to say "that's not what we call it". [Domain isolation](/domain-isolation#bounded-contexts) explains where the words come from.
 
 **It carries what happened, not everything.** The event for a move carries the customer's identifier, the new address and the date. It doesn't carry the whole customer record with one field changed, because then every reader has to compare two records to find out what the event was about. The event says what happened; the reader works out what that means for them.
 
-**It refers to other things by identifier.** An event from Checkout carries the identifier of the customer and of the products, not the customer's model or the product's. The reason is the one given in [Domain isolation](/domain-isolation#refer-by-identifier-and-nothing-more): anything more would tie every reader to another domain's model.
+**It refers to other things by identifier.** An event from Checkout carries the identifier of the customer and of the products, not the customer's model or the product's. The reason is the one given in [Domain isolation](/domain-isolation#contexts-do-not-overlap): anything more would tie every reader to another domain's model.
 
 **It never changes.** A fact is a fact. When it turns out to be wrong, the correction is a new event, the way an accountant reverses an entry instead of erasing it: address corrected, order cancelled, payment refunded. This rule is what makes the record trustworthy. Anything that can be edited afterwards is state, not history.
 
@@ -68,7 +68,7 @@ One confusion is worth clearing up early, because it shows in the names. A **com
 
 ### Where the events come from
 
-If you have run an [event storming](/domain-isolation#event-storming-then-modelling) workshop to find your domain boundaries, the wall is full of notes in the past tense, in the words of the business. That wall is the first draft of the events in your system. The workshop found what happens in the business; the software records it under the same names. That is also why the names are worth arguing about at the wall: they will outlive the sticky notes by years.
+In an event storming workshop, the people who know the business and the people who build the software write down everything that happens in the business, each on a sticky note of its own. If you have run one, you have seen the wall fill up with notes in the past tense, in the words of the business. That wall is the first draft of the events in your system. The workshop found what happens in the business; the software records it under the same names. That is also why the names are worth arguing about at the wall: they will outlive the sticky notes by years.
 
 ## Telling instead of asking
 
@@ -80,7 +80,7 @@ The second is that Checkout publishes what happened, an order was placed, and Sh
 
 <AskListenFigure />
 
-The difference is who depends on whom. With a call, the domain where something happens depends on every domain that has to react. With an event, the reaction depends on the fact, and the domain that produced the fact depends on nobody. This is the same rule that [Domain isolation](/domain-isolation#free-of-technology) applies within a domain, every dependency pointing at the stable centre, now applied between domains. The event is the stable thing. The reactions come and go.
+The difference is who depends on whom. With a call, the domain where something happens depends on every domain that has to react. With an event, the reaction depends on the fact, and the domain that produced the fact depends on nobody. This is the same rule that [Domain isolation](/domain-isolation#framework-agnostic) applies within a domain, every dependency pointing inward, now applied between domains. The event is the stable thing. The reactions come and go.
 
 So an event-driven system is one in which domains tell instead of ask. A domain publishes the facts about what happened inside it, and other domains subscribe to the facts they care about. What travels between the circles in the picture on the [overview](/) is exactly that: facts, which others can use without reaching inside.
 
@@ -88,13 +88,13 @@ So an event-driven system is one in which domains tell instead of ask. A domain 
 
 The reaction to an event happens after the event, and usually on another machine. Between the moment Checkout records the order and the moment Shipping has prepared the shipment, the two domains disagree: Checkout knows about an order that Shipping hasn't seen yet. That gap is usually milliseconds, and sometimes, when Shipping is down or busy, minutes. Systems that work this way are called **eventually consistent**: every part arrives at the same picture, but not at the same instant.
 
-Sounds like a weakness? For engineers who are used to one database and one transaction, it takes getting used to. But the business has always worked this way. The warehouse picks the parcel hours after the order is placed, and nobody calls that an inconsistency. The question to ask at each boundary is how long the business can live with the gap. The answer is nearly always "longer than the software takes". Where the answer is "not at all", where two changes really have to succeed or fail as one, the two belong in one domain. A transaction never spans two domains, as [Domain isolation](/domain-isolation#one-transaction-one-domain) explains.
+Sounds like a weakness? For engineers who are used to one database and one transaction, it takes getting used to. But the business has always worked this way. The warehouse picks the parcel hours after the order is placed, and nobody calls that an inconsistency. The question to ask at each boundary is how long the business can live with the gap. The answer is nearly always "longer than the software takes". Where the answer is "not at all", where two changes really have to succeed or fail as one, the two belong in one domain.
 
 What eventual consistency asks of a user interface is honesty. "Your order has been placed" is true the moment the event is recorded. "Your parcel has been prepared" is not, so the screen says "being prepared" until the event that says otherwise arrives.
 
 ### Copies that feed themselves
 
-Shipping needs the delivery address to prepare a shipment, and the address belongs to Customers. Domain isolation [settles](/domain-isolation#one-source-of-truth-and-copies-you-can-throw-away) that Shipping may keep a copy, as long as Customers stays the source of truth and the copy can be thrown away. What it leaves open is how the copy stays fresh.
+Shipping needs the delivery address to prepare a shipment, and the address belongs to Customers. Domain isolation [settles](/domain-isolation#contexts-do-not-overlap) that Shipping may keep a copy, as long as Customers stays the source of truth and the copy can be thrown away. What it leaves open is how the copy stays fresh.
 
 The answer is that Shipping listens to Customers. Every move is an event, and Shipping's copy is updated by handling it. Nobody polls, nobody synchronises overnight, and Customers has no idea that Shipping keeps a copy. When the copy is wrong, or when a new domain needs a copy of its own, it is built by reading the events again from the beginning. That only works if the events are still there. More on that in the next section.
 
@@ -156,7 +156,7 @@ The difference with the previous step is where the truth lives. With the events 
 A few things follow that engineers should know before choosing it.
 
 - **Replaying gets long.** An order has a dozen events and replays in no time. A bank account has years of them. The standard answer is a **snapshot**: the state at a point in time, stored so that a replay starts there instead of at the beginning. Snapshots are a cache, and disposable like any projection.
-- **Two writers can collide.** If two commands for the same order arrive at once, both replay the same events and both want to append. The event store rejects the second, because the stream has moved on since it looked, and the second command is retried against the new state. This is **optimistic concurrency**, and it makes the transaction boundary from Domain isolation concrete: one stream, one order, one decision at a time.
+- **Two writers can collide.** If two commands for the same order arrive at once, both replay the same events and both want to append. The event store rejects the second, because the stream has moved on since it looked, and the second command is retried against the new state. This is **optimistic concurrency**, and it makes the boundary of a transaction concrete: one stream, one order, one decision at a time.
 - **Old events never go away.** The event written in the first year of the system will still be read in the tenth, in whatever shape it had then. Every reader has to understand every version ever written, or the old versions have to be translated on the way in. An event that leaves a domain is a promise to whoever reads it. That makes it a contract, and everything about specifying and versioning contracts in [Specified contracts](/specified-contracts) applies to it.
 
 Event sourcing is a choice per domain, not per system. It pays off in the domains where the history is the business: orders, payments, contracts, anything that gets audited or disputed. It is overkill for a table of countries.

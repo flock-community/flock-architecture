@@ -47,7 +47,7 @@ You recognise an edge by one thing: the two sides are built and released separat
 
 How the data travels doesn't matter. A request over the web, a message on a queue and a file in a shared folder all carry data in an agreed shape, so all of them belong in the contract. The same goes for every kind of message: a question, an instruction, or a report that something happened.
 
-Everything that can be reached from outside is part of the contract, written down or not. So nothing should be reachable that isn't in it. In particular, there should be no way around the edge and straight into the database. [Domain isolation](/domain-isolation#the-same-rule-in-the-database) rules that out for its own reasons.
+Everything that can be reached from outside is part of the contract, written down or not. So nothing should be reachable that isn't in it. In particular, there should be no way around the edge and straight into the database. [Domain isolation](/domain-isolation#contexts-do-not-overlap) rules that out for its own reasons.
 
 Inside one codebase the compiler does this job for you. The compiler is the program that checks your code before it runs. Change what a function expects, and it points at every place that calls it. Across the edge, none of that works. The other side is built somewhere else, released on someone else's schedule, and you may not even know who they are. A specification does for the edge what the compiler does inside the code: it states what both sides may expect, in a form that can be checked.
 
