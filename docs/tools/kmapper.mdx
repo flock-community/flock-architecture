@@ -51,7 +51,7 @@ The work happens while the code is compiled, and that is what sets KMapper apart
 Two details matter for keeping the domain clean:
 
 - **The mapping lives outside the domain.** A `mapper` call belongs in the code that talks to the database or answers a request, not in the domain model. The domain keeps no dependency on KMapper, just as it keeps none on a database or a framework.
-- **Identifiers keep their own type.** The deep dive recommends giving each identifier a type of its own, so a shipment's identifier can't end up where an order's is expected. KMapper wraps and unwraps such types on its own, so the domain can use them while a database row or a message carries the plain value.
+- **Identifiers keep their own type.** Parts of the business [refer to each other by identifier](/domain-isolation#contexts-do-not-overlap). It helps to give each identifier a type of its own, so a shipment's identifier can't end up where an order's is expected. KMapper wraps and unwraps such types on its own, so the domain can use them while a database row or a message carries the plain value.
 
 ## What it brings
 

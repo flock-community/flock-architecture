@@ -167,7 +167,7 @@ function DiscLabels({discs}) {
 export function OverlapFigure() {
   const shared = lens(...OVERLAPPING);
   return (
-    <Figure caption="Two domains that share part of their model, and the same two with only an identifier between them.">
+    <Figure caption="Two bounded contexts that share part of their model, and the same two with only an identifier between them.">
       <div className={styles.panels}>
         <div>
           <p className={styles.panelTitle}>Overlap</p>

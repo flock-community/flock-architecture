@@ -25,9 +25,9 @@ Storing state is enough for a lot of software, but the questions a business asks
 
 An event is a fact, and everything else follows from that.
 
-**It is named after what happened, in the past tense, in the words of the business.** Order placed. Payment received. Parcel handed to carrier, not `ShipmentDispatched`, if that is what the warehouse says. The names of your events are the vocabulary of the system, and a good one lasts for years. If you have run an [event storming](/domain-isolation#event-storming-then-modelling) workshop, its wall of notes in the past tense is the first draft of your events.
+**It is named after what happened, in the past tense, in the words of the business.** Order placed. Payment received. Parcel handed to carrier, not `ShipmentDispatched`, if that is what the warehouse says. The names of your events are the vocabulary of the system, and a good one lasts for years. In an event storming workshop, the business and the engineers write down everything that happens in the business on sticky notes. That wall of notes in the past tense is the first draft of your events.
 
-**It carries what happened, not everything.** A move carries the customer's identifier, the new address and the date, not the whole customer record. Anything else it refers to [by identifier](/domain-isolation#refer-by-identifier-and-nothing-more).
+**It carries what happened, not everything.** A move carries the customer's identifier, the new address and the date, not the whole customer record. Anything else it refers to [by identifier](/domain-isolation#contexts-do-not-overlap).
 
 **It never changes.** A wrong fact is corrected by a new event, the way an accountant reverses an entry instead of erasing it. Anything that can be edited afterwards is state, not history.
 
@@ -41,13 +41,13 @@ Events matter most at the boundary between two domains. When a customer places a
 
 The difference is who depends on whom. With a call, the domain where something happens depends on every domain that has to react. With an event, the reactions depend on the fact, and the domain that produced it depends on nobody. That is what travels between the circles on the [overview](/): facts, which others can use without reaching inside.
 
-The same mechanism feeds copies. Domain isolation [allows](/domain-isolation#one-source-of-truth-and-copies-you-can-throw-away) Shipping a copy of the delivery address as long as Customers stays the source of truth, and events keep it fresh: Shipping handles every move, and rebuilds the copy from the events when it is wrong.
+The same mechanism feeds copies. Domain isolation [allows](/domain-isolation#contexts-do-not-overlap) Shipping a copy of the delivery address as long as Customers stays the source of truth, and events keep it fresh: Shipping handles every move, and rebuilds the copy from the events when it is wrong.
 
 ### A moment later
 
 The reaction happens after the event, so for a moment Checkout knows about an order that Shipping hasn't seen yet. This is called **eventual consistency**: every part arrives at the same picture, but not at the same instant.
 
-Sounds like a weakness? The business has always worked this way: the warehouse picks the parcel hours after the order is placed, and nobody calls that an inconsistency. Ask at each boundary how long the business can live with the gap. Where the answer is "not at all", the two belong in one domain, because [a transaction never spans two domains](/domain-isolation#one-transaction-one-domain).
+Sounds like a weakness? The business has always worked this way: the warehouse picks the parcel hours after the order is placed, and nobody calls that an inconsistency. Ask at each boundary how long the business can live with the gap. Where the answer is "not at all", the two belong in one domain.
 
 ### Making sure it arrives
 

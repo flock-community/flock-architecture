@@ -33,8 +33,8 @@ const PILLARS = [
     essence: 'Keep the heart of the business free of everything else.',
     body: (
       <>
-        The domain is the part of your software that captures how the
-        business works, in the words the business uses. We keep it on its
+        The domain is what your business does and the rules it follows. In
+        software it takes the form of a model, and we keep that model on its
         own. It doesn&apos;t depend on a database, a framework or another
         team&apos;s model. Everything else depends on it. Each part of the
         business has one owner, and the other parts refer to it by an
