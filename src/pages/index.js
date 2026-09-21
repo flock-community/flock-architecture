@@ -145,8 +145,9 @@ export default function Home() {
             Architecture for software that has to keep changing.
           </Heading>
           <p className={styles.heroLead}>
-            Software never stops changing. At Flock we build on three ideas
-            that keep a system easy to change, long after its first release.
+            The only constant in software is change. At Flock we build on
+            three ideas that keep a system easy to change, long after its
+            first release.
           </p>
         </div>
         <div className={clsx('container', styles.sceneWrap)}>
