@@ -7,10 +7,10 @@ sidebar_position: 1
 
 # The pragmatic repository
 
-[flock-community/pragmatic](https://github.com/flock-community/pragmatic) is a public repository in Flock's GitHub organisation. Its full name is "Pragmatic Functional Programming in Kotlin", and it holds a small but complete application built the way this site describes: the domain in a module of its own, the API written down as a specification, and errors handled as values instead of exceptions. It shares its name with the [workshop](/study-material/workshop), and has the shape the workshop works towards.
+[flock-community/pragmatic](https://github.com/flock-community/pragmatic) is a public repository in Flock's GitHub organisation. Its full name is "Pragmatic Functional Programming in Kotlin". It holds a small but complete application built the way this site describes: the domain in a module of its own, the API written down as a specification, and errors handled as values instead of exceptions. It shares its name with the [workshop](/study-material/workshop), and it has the shape the workshop works towards.
 
 - **Where:** [github.com/flock-community/pragmatic](https://github.com/flock-community/pragmatic)
-- **Made by:** Jerre van Veluw, software engineer at Flock, who started it in 2023 and keeps it up to date. Published under the MIT licence, so you are free to copy from it.
+- **Made by:** Jerre van Veluw, software engineer at Flock. He started it in 2023 and keeps it up to date. It is published under the MIT licence, so you are free to copy from it.
 - **Built with:** Kotlin, Spring Boot, Arrow, Wirespec and PostgreSQL, built with Maven.
 - **Shows:** [Specified contracts](/specified-contracts) and [Domain isolation](/domain-isolation).
 
@@ -18,22 +18,22 @@ sidebar_position: 1
 
 The application keeps users. You can list them, fetch one by its identifier, add one and delete one. That is deliberately little. A user has a first name, a last name and a birth date, and there are only two rules: a name can't be blank, and the birth date has to be a real date. With so little business to model, the structure around it is what you see.
 
-"Pragmatic" is the important word in its name. The repository uses functional programming where it pays off, and nowhere else. The domain is pure, invalid data is turned away at the edge, and an operation that can fail says so in its type. At the same time it is an ordinary Spring Boot application with an ordinary relational database, built with the tools most Kotlin teams already use. The ideas are the point, not the tooling.
+"Pragmatic" is the important word in the name. The repository uses functional programming where it pays off, and nowhere else. The domain is pure, invalid data is turned away at the edge, and an operation that can fail says so in its type. At the same time it is an ordinary Spring Boot application with an ordinary relational database, built with the tools most Kotlin teams already use. The ideas are the point, not the tooling.
 
 ## How it is built
 
 The code is split into four modules, and the direction of the dependencies between them is the whole story.
 
-- **`domain`** holds the model, the rules and the operations: what a user is, what makes one valid, and how you get, save and delete one. It also declares what it needs from the outside, as interfaces: a place to keep users, and a way to reach a pet store. It depends on nothing but the Kotlin standard library and Arrow, a library for functional programming in Kotlin, used here mainly for its Either type: a value that is either a result or an error. No web framework, no database, no other module.
+- **`domain`** holds the model, the rules and the operations: what a user is, what makes one valid, and how you get, save and delete one. It also declares what it needs from the outside, as interfaces: a place to keep users, and a way to reach a pet store. It depends on nothing but the Kotlin standard library and Arrow. Arrow is a library for functional programming in Kotlin, used here mainly for its Either type: a value that is either a result or an error. No web framework, no database, no other module.
 - **`api`** holds the contract: one short file in [Wirespec](/tools/wirespec), a small language for writing down which endpoints exist, what goes in, and which responses can come out. From that file the build generates code: the shapes of the data on the wire, and the interfaces the application has to implement to honour the contract.
 - **`app`** is the Spring Boot application, and the only module that knows about the web and the database. Controllers implement the generated interfaces from the contract. Small converters check incoming data and turn it into domain objects, and turn domain objects back into the shapes the contract promises. A repository stores users in PostgreSQL. An "edge" turns errors into HTTP responses. And one small class wires the pieces together.
-- **`spi`** shows the contract idea in the other direction: the client for an external service, the well-known example pet store, generated from that service's published OpenAPI specification, the common format for describing web APIs. Nothing is written by hand for a service someone else has already specified.
+- **`spi`** shows the contract idea in the other direction: the client for an external service, the well-known example pet store, generated from that service's published OpenAPI specification. OpenAPI is the common format for describing web APIs. Nothing is written by hand for a service someone else has already specified.
 
-So `app` depends on `domain` and `api`, and `domain` depends on nothing. The business rules sit in the middle, the technology sits around them, and the technology can be swapped without touching the rules. That is [domain isolation](/domain-isolation) in its smallest form.
+So `app` depends on `domain` and `api`, and `domain` depends on nothing. The business rules sit in the middle, the technology sits around them, and you can swap the technology without touching the rules. That is [domain isolation](/domain-isolation) in its smallest form.
 
 ## The contract
 
-This is the whole of what the API promises about fetching one user, in Wirespec:
+This is everything the API promises about fetching one user, in Wirespec:
 
 ```
 type UserDto {
@@ -51,11 +51,11 @@ endpoint GetUserById GET /api/users/{id: UserIdentifier} -> {
 }
 ```
 
-It reads as a sentence: a request for a user by identifier answers with a user, or with an error and one of three specific status codes. Because the interfaces are generated from this file, the controller can't answer with anything else, and the code can't drift from the promise without the build noticing. Anyone who uses the API, or who builds a client for it in another language, works from the same file.
+It reads like a sentence: a request for a user by identifier answers with a user, or with an error and one of three specific status codes. Because the interfaces are generated from this file, the controller can't answer with anything else, and the code can't drift from the promise without the build noticing. Anyone who uses the API, or builds a client for it in another language, works from the same file.
 
 ## Follow one request
 
-The clearest way to read the repository is to follow one request through it. Take adding a user: a POST to `/api/users` with a first name, a last name and a birth date.
+The clearest way to read the repository is to follow one request through it. Let's add a user: a POST to `/api/users` with a first name, a last name and a birth date.
 
 1. **The contract** says what comes in and what can go out: the new user, or an error with status 400 or 500. The generated interface holds the controller to that.
 2. **The controller** hands the incoming data to a validator, which turns it into a domain user, or into the list of everything that is wrong with it. All problems are collected at once, so a caller who sends an empty name and an impossible date hears about both.
@@ -63,15 +63,15 @@ The clearest way to read the repository is to follow one request through it. Tak
 4. **The live repository** in the application module writes a row to PostgreSQL and hands back the stored user, which now has an identifier.
 5. **A producer** turns the stored user into the response shape from the contract, and the controller returns it.
 
-One detail worth noticing: a user before it is saved and a user after it is saved are different types, one without an identifier and one with. The compiler stops you from using an unsaved user where a saved one is expected. That is a small example of a habit the repository keeps throughout: let the types rule out states that make no sense, so that nobody has to check for them.
+One detail worth noticing: a user before it is saved and a user after it is saved are different types, one without an identifier and one with. The compiler stops you from using an unsaved user where a saved one is expected. It is a small example of a habit the repository keeps throughout: let the types rule out states that make no sense, so nobody has to check for them.
 
 ## Errors are values
 
-Nothing in the domain throws an exception. Every operation that can fail returns either a result or an error, and the errors form a small, closed set: validation errors for bad input, domain errors such as "user not found", and technical errors for when the database is unreachable. Because the set is closed, the compiler can tell whether the controller has mapped every error to a response the contract allows. It has to, or the code won't build. Nothing slips through unhandled, and nothing is handled twice.
+Nothing in the domain throws an exception. Every operation that can fail returns either a result or an error, and the errors form a small, closed set: validation errors for bad input, domain errors like "user not found", and technical errors for when the database is unreachable. Because the set is closed, the compiler can check whether the controller has mapped every error to a response the contract allows. It has to, or the code won't build. Nothing slips through unhandled, and nothing is handled twice.
 
 ## Testing without infrastructure
 
-Because the domain depends on nothing, its tests need nothing: a test repository that keeps users in memory stands in for the database, and the tests run in milliseconds. The application module tests the real thing: the repository against a real PostgreSQL that starts in a container for the duration of the test, and the API from the outside, end to end. The two kinds of test have clearly separate jobs, which is a direct consequence of the separation in the code.
+Because the domain depends on nothing, its tests need nothing. A test repository that keeps users in memory stands in for the database, and the tests run in milliseconds. The application module tests the real thing: the repository against a real PostgreSQL that starts in a container for the duration of the test, and the API from the outside, end to end. The two kinds of test have clearly separate jobs, which follows directly from the separation in the code.
 
 ## Where to look
 

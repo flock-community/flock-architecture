@@ -1,6 +1,6 @@
 ---
 title: Domain isolation
-description: Keep the part of the software that captures how the business works free of technology and of other teams' models.
+description: Keep the part of your software that captures how the business works free of technology and of other teams' models.
 slug: /domain-isolation
 sidebar_position: 2
 ---
@@ -9,34 +9,34 @@ import {DependencyFigure, OverlapFigure} from '@site/src/components/DomainIsolat
 
 # Domain isolation
 
-The domain is the part of the software that captures how the business works: its rules, its decisions and the words it uses for them. It is the reason the software exists. Everything around it, such as the database, the web framework and the messaging system, is there to serve it, and most of that will be replaced more than once while the system is alive.
+The domain is the part of your software that captures how the business works: its rules, its decisions and the words it uses for them. It is the reason the software exists. Everything around it, like the database, the web framework and the messaging system, is there to serve it. And most of that will be replaced more than once while the system is alive.
 
-Domain isolation means keeping that part on its own. It has two sides, and the second is the one that gets forgotten:
+Domain isolation means keeping that part on its own. It has two sides, and the second one is the one that gets forgotten:
 
-1. **Free of technology.** The domain doesn't depend on a database, a framework or a messaging system. They depend on it.
-2. **Its own bounded context.** The domain's model holds within a boundary of its own and doesn't depend on another part's model. Where two parts of the business touch, they refer to each other by an identifier and nothing more.
+1. **Free of technology.** The domain doesn't depend on a database, a framework or a messaging system. They depend on the domain.
+2. **Its own bounded context.** The domain's model stays within a boundary of its own and doesn't depend on another part's model. Where two parts of the business touch, they refer to each other by an identifier, and nothing more.
 
-Of the three pillars, this is the one we compromise on least. This deep dive explains both sides and what they mean for your code and your database. Then it turns to the harder questions: how to find the boundaries, how to guard them, and when you can do without it.
+This is the pillar we compromise on least. In this deep dive we explain both sides and what they mean for your code and your database. Then we turn to the harder questions: how do you find the boundaries, how do you guard them, and when can you do without?
 
 ## What the domain is
 
-Take a web shop. Somewhere in its software live rules like these: an empty cart can't be ordered, an order can't change once it has been paid, a parcel over thirty kilos travels as freight. None of them has anything to do with PostgreSQL, HTTP or Kafka. They would be just as true if the shop ran on paper.
+Let's take a web shop. Somewhere in its software live rules like these: an empty cart can't be ordered, an order can't change once it has been paid, a parcel over thirty kilos travels as freight. None of these rules has anything to do with PostgreSQL, HTTP or Kafka. They would be just as true if the shop ran on paper.
 
-That is the domain: what the business does and the rules it follows. In code it takes the form of a **domain model**, a set of types and functions named after the things the business talks about: cart, order, shipment.
+That is the domain: what the business does and the rules it follows. In code it takes the form of a **domain model**: a set of types and functions named after the things the business talks about. Cart, order, shipment.
 
-Around the model sits everything it takes to run it as a real system: storing data, answering web requests, sending messages, logging, security. All of it is necessary, and none of it is the point.
+Around the model sits everything you need to run it as a real system: storing data, answering web requests, sending messages, logging, security. All of it is necessary, and none of it is the point.
 
-A business is usually too big for one model. The web shop as a whole is a domain, and so is each of its parts: customers, checkout, payments, shipping, the warehouse. When this page says *a domain*, it means one such part, one circle in the picture on the [overview](/). The first side of isolation is about a single circle. The second is about how circles relate.
+A business is usually too big for one model. The web shop as a whole is a domain, and so is each of its parts: customers, checkout, payments, shipping, the warehouse. When we say *a domain* on this page, we mean one such part, one circle in the picture on the [overview](/). The first side of isolation is about a single circle. The second is about how circles relate.
 
 ## Free of technology
 
-Code depends on other code when it can't be compiled, tested or understood without it. Draw every dependency in a system as an arrow and you get a graph. The first condition for an isolated domain is easy to state: **the dependency graph ends in the domain**. Arrows point at it, and none leave it.
+Code depends on other code when it can't be compiled, tested or understood without it. Draw every dependency in a system as an arrow and you get a graph. The first condition for an isolated domain is simple: **the dependency graph ends in the domain**. Arrows point at it, and no arrow leaves it.
 
 <DependencyFigure />
 
-So the web layer knows the domain and the database code knows the domain, while the domain knows neither. The reason is the direction in which change travels: against the arrows. When something changes, whatever depends on it may have to change too. Technology changes often, and for reasons that have nothing to do with the business: a new version, a new vendor, a new fashion. If the domain depended on the database, each of those changes could reach the business rules. With every arrow pointing at the domain, the rules are the stable centre, and the technology around them is the part you can swap.
+So the web layer knows the domain, and the database code knows the domain, but the domain knows neither. Why this direction? Because change travels against the arrows. When something changes, everything that depends on it may have to change too. Technology changes often, and for reasons that have nothing to do with the business: a new version, a new vendor, a new fashion. If the domain depended on the database, each of those changes could reach the business rules. With every arrow pointing at the domain, the rules are the stable centre, and the technology around them is what you can swap.
 
-Where the domain needs something from the outside world, to load a cart or to send a confirmation, it says so itself in the form of an interface: a description, in the domain's own words, of what it needs, without a word about how. Code outside the domain fulfils that need.
+Where the domain needs something from the outside world, to load a cart or to send a confirmation, it says so itself, in the form of an interface: a description in the domain's own words of what it needs, without a word about how. Code outside the domain fulfils that need.
 
 ```kotlin title="Inside the domain"
 class Cart(val id: CartId, private val items: List<CartItem>) {
@@ -66,40 +66,40 @@ class PostgresCarts(private val database: Database) : Carts {
 }
 ```
 
-The first block holds a business rule and states a need. It imports nothing from a framework, a database driver or a web library, so it reads as a description of the business. The second block is one possible answer to that need. Replace PostgreSQL with something else, and not a character of the first block changes.
+The first block holds a business rule and states a need. It imports nothing from a framework, a database driver or a web library, so it reads like a description of the business. The second block is one possible answer to that need. Replace PostgreSQL with something else, and not a character of the first block changes.
 
-This shape goes by several names: hexagonal architecture, ports and adapters, onion architecture, clean architecture. They differ in the details and agree on the rule that matters: dependencies point inward. That rule is independent of language and framework, and it is easy to check. Open the domain code and read its imports.
+This shape has several names: hexagonal architecture, ports and adapters, onion architecture, clean architecture. They differ in the details and agree on the rule that matters: dependencies point inward. That rule doesn't depend on a language or a framework, and it is easy to check. Open the domain code and read its imports.
 
 ### What stays out
 
 - **Framework and persistence annotations.** Frameworks make it very easy to put a database annotation and a JSON annotation on one class and call it done. That class now has three jobs: it is the business concept, the database row and the message on the wire. It can't change for one of those reasons without the other two feeling it.
-- **The shape of the database.** Table layout, generated keys and the way rows are loaded are storage concerns, solved outside the domain.
-- **The shape of the interface.** What goes over the wire is a model of its own, and what belongs in it is the subject of [Specified contracts](/specified-contracts).
-- **Libraries in general.** The fewer, the better. A domain that needs only the language and its standard library will outlive every framework around it.
+- **The shape of the database.** Table layout, generated keys and the way rows are loaded are storage concerns. They are solved outside the domain.
+- **The shape of the interface.** What goes over the wire is a model of its own. [Specified contracts](/specified-contracts) explains what belongs in it.
+- **Libraries in general.** The fewer, the better. A domain that needs only the language and its standard library outlives every framework around it.
 
 ### The price is mapping
 
-The usual objection comes quickly: if the domain model, the database model and the interface model are three different things, somebody has to write the code that translates between them. That is true, and it is the whole price. The code is dull, there isn't much of it, and it is the kind of code that today's AI tools write well. In return, each of the three models changes for its own reasons and at its own pace. You can restructure the tables without touching a business rule, and rework the model without breaking anyone who calls you.
+The usual objection comes quickly: if the domain model, the database model and the interface model are three different things, somebody has to write the code that translates between them. True, and that is the whole price. The code is boring, there isn't much of it, and it is the kind of code that today's AI tools write well. In return, each of the three models changes for its own reasons and at its own pace. You can restructure the tables without touching a business rule, and rework the model without breaking anyone who calls you.
 
 ### Start with the domain
 
-An isolated domain can be built before anything else exists. We have started new services by writing nothing but the domain: no database layer, no API, only the model and a set of unit tests, small automated checks that need no database and no server. There is one test for every case the business has. They run in milliseconds, because there is nothing to start up. When they all pass, the heart of the service is done and proven, and nobody has had to choose a database yet. The tests also mark where to stop: the domain supports the cases the business has, and no more than that.
+An isolated domain can be built before anything else exists. We have started new services by writing nothing but the domain: no database layer, no API, just the model and a set of unit tests. Unit tests are small automated checks that need no database and no server. There is one test for every case the business has, and they run in milliseconds because there is nothing to start up. When they all pass, the heart of the service is done and proven, and nobody has had to choose a database yet. The tests also tell you where to stop: the domain supports the cases the business has, and no more.
 
-This goes against the habit of starting with the API or the tables, which are tangible and easy to show around. But as long as nobody depends on it, an interface is cheap to redraw. A misunderstanding of the business is not: it ends up in every layer built on top of it. And a model has become easier to show than it used to be. Diagrams generated straight from the domain code are a good thing to put in front of the people from the business.
+This goes against the habit of starting with the API or the tables, which are tangible and easy to show around. But as long as nobody depends on it, an interface is cheap to redraw. A misunderstanding of the business is not: it ends up in every layer built on top of it. And showing a model has become easier than it used to be. Diagrams generated straight from the domain code are a good thing to put in front of the business.
 
 ## Its own bounded context
 
 The second side is about concepts rather than technology. A domain without a single library dependency can still lean on another domain's model, and that dependency hurts in the same way: the domain now changes for someone else's reasons.
 
-Each part of the business gets a model of its own, and a boundary within which that model and its words apply. Domain-driven design, the body of ideas this pillar builds on, calls that a **bounded context**. Whether you call the parts domains, subdomains or bounded contexts matters less than the rule we apply to them: **they don't overlap**.
+So each part of the business gets a model of its own, and a boundary within which that model and its words apply. Domain-driven design, the body of ideas this pillar builds on, calls that a **bounded context**. Whether you call the parts domains, subdomains or bounded contexts matters less than the rule we apply to them: **they don't overlap**.
 
 <OverlapFigure />
 
-Picture two domains as circles in a Venn diagram. The overlap is whatever both of them know and both of them can change: a shared table, a shared class, a library of "common" models. We want that overlap to be as small as it can possibly be, and the smallest thing that still lets two domains talk about the same thing is an identifier.
+Picture two domains as circles in a Venn diagram. The overlap is whatever both of them know and both of them can change: a shared table, a shared class, a library of "common" models. We want that overlap to be as small as possible. And the smallest thing that still lets two domains talk about the same thing is an identifier.
 
 ### Refer by identifier and nothing more
 
-When a customer checks out, a shipment has to be created. Checkout needs to know *which* shipment belongs to the order, so that it can point to it later. It doesn't need the carrier, the parcels, the route or the delivery status. Those belong to Shipping.
+When a customer checks out, a shipment has to be created. Checkout needs to know *which* shipment belongs to the order, so it can point to it later. It doesn't need the carrier, the parcels, the route or the delivery status. Those belong to Shipping.
 
 ```kotlin title="Tempting: Checkout pulls Shipping's model inside"
 class Order(val id: OrderId, val shipment: Shipment)
@@ -112,45 +112,45 @@ class Order(val id: OrderId, val shipmentId: ShipmentId)
 value class ShipmentId(val value: UUID)
 ```
 
-The first version drags everything Shipping knows about a shipment into Checkout. The second holds a reference and nothing else. The identifier has a type of its own, so a shipment's identifier can't end up where an order's is expected, and that type is all Checkout knows about shipping.
+The first version drags everything Shipping knows about a shipment into Checkout. The second holds a reference and nothing else. The identifier has a type of its own, so a shipment's identifier can't end up where an order's is expected. That type is all Checkout knows about shipping.
 
-Pulling the other model in is always the easier thing to do at the moment you do it, because the data is right there. The bill comes later. Checkout breaks when Shipping changes its model. Shipment data lives in two places, and sooner or later the two disagree. And nobody can say any more who is responsible for a delivery status being right.
+Pulling the other model in is always the easier thing to do at that moment, because the data is right there. The bill comes later. Checkout breaks when Shipping changes its model. Shipment data lives in two places, and sooner or later the two disagree. And nobody can say anymore who is responsible for a delivery status being right.
 
 A domain that needs to show another domain's data asks the owner for it, by identifier, at the moment it needs it. Or it keeps a copy, under the conditions described [further down](#one-source-of-truth-and-copies-you-can-throw-away).
 
 ### One owner
 
-Every piece of data and every rule has exactly one owner: one domain, and behind it one team. If we own shipments, nobody else stores shipments or changes them. They ask us.
+Every piece of data and every rule has exactly one owner: one domain, and behind it one team. If we own shipments, nobody else stores or changes shipments. They ask us.
 
-That is as much an agreement between people as a property of code. Inside a team that looks after several domains it is easy to keep. Across teams it takes an explicit agreement on who owns what, and somebody who notices when it is quietly being broken.
+This is as much an agreement between people as a property of code. Within a team that looks after several domains it is easy to keep. Across teams it takes an explicit agreement on who owns what, and somebody who notices when it is quietly being broken.
 
 ### One transaction, one domain
 
-A useful test for where a boundary runs is the transaction: a group of changes that succeed or fail together, and that can be rolled back in one go. What has to change together belongs together. Seen from the business, the boundary is a bounded context. Seen from the database, the same line is a **consistency boundary**, the limit of what a single transaction may touch. They are the functional and the technical view of one line.
+A useful test for where a boundary runs is the transaction: a group of changes that succeed or fail together, and that can be rolled back in one go. What has to change together belongs together. Seen from the business, the boundary is a bounded context. Seen from the database, the same line is a **consistency boundary**: the limit of what a single transaction may touch. They are the functional and the technical view of one line.
 
-It follows that a transaction never spans two domains. If placing an order and creating its shipment have to happen in one database transaction, then either the two are really one domain or a boundary is being broken. When they are separate, the second change follows the first a moment later. Making sure that it does follow is a real engineering problem, but a separate one, and a wider transaction is not the solution. How one domain learns what happened in another is the subject of [Event-driven](/event-driven).
+This means that a transaction never spans two domains. If placing an order and creating its shipment have to happen in one database transaction, then either the two are really one domain, or a boundary is being broken. When they are separate, the second change follows the first a moment later. Making sure that it does follow is a real engineering problem, but a separate one, and a wider transaction is not the solution. [Event-driven](/event-driven) explains how one domain learns what happened in another.
 
 ## The same rule in the database
 
-None of this requires microservices, or events. The rule holds just as well in one application on one relational database, and that is where it gets broken most often, because a relational database makes overlap so easy. Any table can be joined to any other in a single query. And a foreign key, a constraint that makes the database check that a referenced row exists, welds two tables together.
+None of this requires microservices or events. The rule holds just as well in one application on one relational database. That is also where it gets broken most often, because a relational database makes overlap so easy. Any table can be joined to any other in a single query. And a foreign key, a constraint that makes the database check that a referenced row exists, welds two tables together.
 
 Inside a domain, use the database any way you like. Across the boundary between two domains:
 
 - **No joins.** A query stays within the tables of one domain. To combine data from two domains, the application asks each owner by identifier and puts the answers together.
 - **No foreign keys.** Checkout's order table stores the shipment's identifier as a plain value. The database doesn't enforce it, because the database shouldn't know that these two domains have anything to do with each other.
-- **No shared transactions, and no writing to someone else's tables**, for the reasons given above.
+- **No shared transactions, and no writing to someone else's tables**, for the reasons above.
 
 Normalising everything into one schema and joining it back together made sense when storage was expensive. Storage is cheap now, and some duplication is a fair price for parts that can change independently.
 
-The reward comes when the system grows. Take a monolith, one application deployed as a whole. If its domains never entangled their tables, it can be split into separate services later, one domain at a time, because there is nothing to untangle first. If all its tables join each other it can't, and that is where moves to microservices tend to get stuck.
+The reward comes when the system grows. Take a monolith, one application deployed as a whole. If its domains never entangled their tables, you can split it into separate services later, one domain at a time, because there is nothing to untangle first. If all its tables join each other, you can't. That is where moves to microservices tend to get stuck.
 
 ### One source of truth, and copies you can throw away
 
 If data gets duplicated, how does it stay correct? Say a customer changes their surname. Do eighty tables need an update?
 
-They don't, because the customer is managed in exactly one place: the Customers domain. That is the **single source of truth**. Any other place that holds the name holds a copy, a cache kept for speed or convenience. Copies are read-only. They may be out of date for a moment. And they are disposable: when a copy is wrong, you throw it away and build it again from the source.
+No, because the customer is managed in exactly one place: the Customers domain. That is the **single source of truth**. Any other place that holds the name holds a copy: a cache kept for speed or convenience. Copies are read-only. They may be out of date for a moment. And they are disposable: when a copy is wrong, you throw it away and build it again from the source.
 
-This swaps one problem for another, since keeping copies fresh is famously hard. It is the better problem to have: whatever goes wrong, there is never any doubt about which value is right. How copies are fed is covered in [Event-driven](/event-driven).
+This swaps one problem for another, because keeping copies fresh is famously hard. But it is the better problem to have: whatever goes wrong, there is never any doubt about which value is right. [Event-driven](/event-driven) explains how copies are fed.
 
 ## Finding the boundaries
 
@@ -162,26 +162,26 @@ Isolation assumes you know where the boundaries are, and finding them is the har
 
 ### Use the words of the business
 
-Inside a boundary there is one language, the language of the business, used in the same sense in conversation, in documents and in code. If the business says shipment, the class is not called `Delivery`.
+Inside a boundary there is one language: the language of the business, used in the same sense in conversation, in documents and in code. If the business says shipment, the class is not called `Delivery`.
 
-It sounds like a detail, and it is where things go wrong most visibly. Once engineers and the business use different words for one thing, or one word for different things, every conversation needs an interpreter and the misunderstandings end up in the code. A good test: someone from the business who listens in while the team discusses the model can follow the discussion, and can say "no, that's not how it works".
+It sounds like a detail, and it is where things go wrong most visibly. Once engineers and the business use different words for one thing, or one word for different things, every conversation needs an interpreter, and the misunderstandings end up in the code. A good test: someone from the business who listens in while the team discusses the model can follow the discussion, and can say "no, that's not how it works".
 
 ### Event storming, then modelling
 
 Two techniques work well together.
 
-**Event storming** is a workshop. Put the people who know the business and the people who build the software in front of one long wall. Have them write down everything that happens in the business, each on a sticky note of its own, in the past tense and in the business's own words: cart checked out, payment received, parcel handed to carrier. Then put the notes in order of time. The wall soon shows where the language shifts, where responsibility passes from one group of people to another, and where the notes cluster. Those are the candidate boundaries. It works because everyone in the business knows what happens in it, including the people who would never read a data model.
+**Event storming** is a workshop. Put the people who know the business and the people who build the software in front of one long wall. Have them write down everything that happens in the business, each on a sticky note of its own, in the past tense and in the business's own words: cart checked out, payment received, parcel handed to carrier. Then put the notes in order of time. The wall soon shows where the language shifts, where responsibility passes from one group of people to another, and where the notes cluster. Those are your candidate boundaries. It works because everyone in the business knows what happens in it, including the people who would never read a data model.
 
-**Domain modelling** follows. For each part, work out the model behind those notes: the things, their rules and the changes that belong together, in the language found on the wall.
+**Domain modelling** follows. For each part, work out the model behind those notes: the things, their rules and the changes that belong together, in the language you found on the wall.
 
-You don't have to build an event-driven system to benefit. The same two steps find the boundaries of a classic system that only stores the current state. What events can do for you after the workshop is covered in [Event-driven](/event-driven).
+You don't have to build an event-driven system to benefit. The same two steps find the boundaries of a classic system that only stores the current state. [Event-driven](/event-driven) explains what the events can do for you after the workshop.
 
 ## Guarding the boundaries
 
-Boundaries are not lost in one big decision. They wear away one shortcut at a time, each of them reasonable on the day: one join, one borrowed class, one annotation. So isolation needs guarding, preferably by something that doesn't get tired:
+Boundaries are not lost in one big decision. They wear away one shortcut at a time, and each shortcut is reasonable on the day: one join, one borrowed class, one annotation. So isolation needs guarding, preferably by something that doesn't get tired:
 
 - **Let the build say no.** Put the domain in a module of its own that depends on nothing but the language. The shortcut then doesn't compile. Give each domain its own database schema and its own database user, and the join across the boundary fails too.
-- **Test the architecture.** A rule such as "nothing in the domain imports from the web layer" can be checked automatically on every build.
+- **Test the architecture.** A rule like "nothing in the domain imports from the web layer" can be checked automatically on every build.
 - **Answer requests with an interface.** When another team asks for "just read access" to your tables, the answer is a [specified contract](/specified-contracts), not a database login.
 - **Write ownership down**, and make sure it is known across teams.
 
@@ -198,21 +198,17 @@ Signs that a boundary is wearing thin:
 
 We treat domain isolation as the foundation: for software that has to last, it isn't up for negotiation. There are two situations in which leaving it out is fine.
 
-**You don't know your domain yet.** A start-up that is still searching for its product is doing research. Its software is an experiment, meant to be thrown away, and a carefully isolated model of a business that doesn't exist yet is wasted effort. In that phase, wiring whatever comes in over the interface straight onto the database tables is a fair shortcut. It stops being one the moment there is a business to maintain and to evolve, and that moment tends to come sooner than expected. Needing a real interface, security and whatever else production asks for is no reason to wait, because all of that fits around an isolated domain. And the step is small: separating the models early costs little.
+**You don't know your domain yet.** A start-up that is still searching for its product is doing research. Its software is an experiment, meant to be thrown away, and a carefully isolated model of a business that doesn't exist yet is wasted effort. In that phase, wiring whatever comes in over the interface straight onto the database tables is a fair shortcut. It stops being one the moment there is a business to maintain and evolve, and that moment tends to come sooner than expected. Needing a real interface, security and whatever else production asks for is no reason to wait, because all of that fits around an isolated domain. And the step is small: separating the models early costs little.
 
 **There is no domain.** A service that only passes data along, translating between two other systems or exposing a table as it is, has no business rules of its own. With nothing to isolate, its interface is the most important thing about it. Do the separating when the first real rule shows up.
 
 What isn't a reason: that the framework makes the shortcut easy. Frameworks are very good at putting everything on one class. That is a convenience they offer, not advice they give.
 
-## In short
+## Conclusion
 
-- The dependency graph ends in the domain.
-- Domains don't overlap. They refer to each other by identifier and nothing more.
-- Every piece of data has one owner. That is the source of truth, and every copy is disposable.
-- A transaction never spans two domains, and neither does a join or a foreign key.
-- Inside a boundary there is one language: the language of the business.
+The dependency graph ends in the domain. Domains don't overlap: they refer to each other by identifier and nothing more. Every piece of data has one owner, which is the source of truth, and every copy is disposable. A transaction never spans two domains, and neither does a join or a foreign key. And inside a boundary there is one language, the language of the business.
 
-Domain isolation is the inside of the circle. What happens at its edge is described in [Specified contracts](/specified-contracts), what travels between circles in [Event-driven](/event-driven), and how the three depend on each other in the [overview](/).
+Domain isolation is the inside of the circle. [Specified contracts](/specified-contracts) is about what happens at its edge, [Event-driven](/event-driven) about what travels between circles, and the [overview](/) shows how the three depend on each other.
 
 ## Study material
 

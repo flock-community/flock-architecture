@@ -17,11 +17,11 @@ const PILLARS = [
     body: (
       <>
         Every system makes promises to the people and systems that use it:
-        which data it offers, and in what shape. Left implicit, nobody knows
-        what is safe to change. A specified contract makes those promises
-        explicit and versioned. You know who relies on what, you can announce
-        changes in time, and you stay free to improve everything behind the
-        contract.
+        which data it offers, and in what shape. If those promises stay
+        implicit, nobody knows what is safe to change. A specified contract
+        makes them explicit and versioned. You know who relies on what, you
+        can announce changes in time, and you stay free to improve everything
+        behind the contract.
       </>
     ),
   },
@@ -33,12 +33,12 @@ const PILLARS = [
     essence: 'Keep the heart of the business free of everything else.',
     body: (
       <>
-        The domain is the part of the software that captures how the business
-        works, in the words the business uses. We keep it on its own. It
-        doesn&apos;t depend on a database, a framework or another team&apos;s
-        model; everything else depends on it. Each part of the business has one
-        owner, and other parts refer to it by an identifier instead of reaching
-        into its data.
+        The domain is the part of your software that captures how the
+        business works, in the words the business uses. We keep it on its
+        own. It doesn&apos;t depend on a database, a framework or another
+        team&apos;s model. Everything else depends on it. Each part of the
+        business has one owner, and the other parts refer to it by an
+        identifier instead of reaching into its data.
       </>
     ),
   },
@@ -50,11 +50,12 @@ const PILLARS = [
     essence: 'Record what happened, not only how things are now.',
     body: (
       <>
-        Most systems only store the current state: the latest address, the
-        latest balance. An event-driven system records what happened, in words
-        everyone understands: an item was added to the cart, a customer moved
-        house. Other parts of the system react to those events and build the
-        view they need. Keep the events, and you keep the full history.
+        Most systems only store how things are now: the latest address, the
+        latest balance. An event-driven system records what happened, in
+        words everyone understands: an item was added to the cart, a customer
+        moved house. Other parts of the system react to those events and
+        build the view they need. Keep the events, and you keep the full
+        history.
       </>
     ),
   },
@@ -70,10 +71,10 @@ const REFERENCES = [
     shows: ['/specified-contracts', '/domain-isolation'],
     body: (
       <>
-        A small but complete application in Kotlin, with its domain in a
-        module of its own and its API written down as a specification. It
+        A small but complete application in Kotlin. Its domain lives in a
+        module of its own, and its API is written down as a specification. It
         shows a pragmatic functional style: invalid input is turned away at
-        the edge, and errors are ordinary values rather than exceptions.
+        the edge, and errors are ordinary values instead of exceptions.
       </>
     ),
   },
@@ -87,7 +88,7 @@ const REFERENCES = [
         A workshop by Jerre van Veluw, software engineer at Flock, at Kotlin
         Dev Day in Amsterdam. You take an existing application and isolate
         its domain step by step, in Kotlin with Spring Boot and Arrow. The
-        workshop and the repository share a name: the repository has the
+        workshop and the repository share a name, and the repository has the
         shape the workshop works towards.
       </>
     ),
@@ -144,9 +145,8 @@ export default function Home() {
             Architecture for software that has to keep changing.
           </Heading>
           <p className={styles.heroLead}>
-            The only constant in software is change. At Flock we build on
-            three ideas that keep a system easy to change, long after its
-            first release.
+            Software never stops changing. At Flock we build on three ideas
+            that keep a system easy to change, long after its first release.
           </p>
         </div>
         <div className={clsx('container', styles.sceneWrap)}>
@@ -185,12 +185,12 @@ export default function Home() {
                 others can use without reaching inside.
               </p>
               <p>
-                Each idea protects the other two. Without an explicit edge, the
+                The three protect each other. Without an explicit edge, the
                 inside leaks out through the interface, and what you have given
                 away is hard to take back. With a contract in place, the inside
-                can change faster than the outside. And because others build what
-                they need from events, the owner of the data stays the single
-                source of truth.
+                can change faster than the outside. And because others build
+                what they need from events, the owner of the data stays the
+                single source of truth.
               </p>
             </div>
             <div>
@@ -200,14 +200,14 @@ export default function Home() {
               <p>
                 Architecture is the set of decisions that are hard to reverse.
                 Programming languages, frameworks and tools change every few
-                years, and replacing them is work that can be planned. How you
-                divide a system, what you promise to others and how you deal with
-                history are different: once a system is in use, they are
-                expensive to undo.
+                years, and replacing them is work you can plan. How you divide a
+                system, what you promise to others and how you deal with history
+                are different. Once a system is in use, they are expensive to
+                undo.
               </p>
               <p>
                 So these are the decisions we take a position on. How far you
-                take each of them depends on your situation. It is about the
+                take each of them depends on your situation. It&apos;s about the
                 right choice, not the best one.
               </p>
             </div>
