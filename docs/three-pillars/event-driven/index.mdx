@@ -1,86 +1,88 @@
 ---
 title: Event-driven
-description: Record what happened instead of only how things are now, and let the rest of the system react to it.
+description: Describe what changed instead of only how things are now, and let the rest of the system react to it.
 slug: /event-driven
 sidebar_position: 3
 ---
 
-import {StateHistoryFigure, AskListenFigure, ViewsFigure} from '@site/src/components/EventDrivenFigures';
+import {StateHistoryFigure, ViewsFigure} from '@site/src/components/EventDrivenFigures';
 
 # Event-driven
 
-An event is a record of something that happened in the business: a customer moved house, an order was placed. Most software throws that information away: it keeps how things are now, and every change overwrites what was there before. An event-driven system keeps the events. Parts of the system tell each other what happened instead of asking how things are, and the events become the record of the business.
+In an event-driven architecture, the parts of a system communicate by publishing **events**. An event is a record of a change of state in the business: a customer moved house, an order was placed. The part in which the change happens publishes it, and other parts react. Martin Fowler's article [What do you mean by "Event-Driven"?](https://martinfowler.com/articles/201701-event-driven.html) shows how much ground the term covers, from a simple notification to a system whose events are its source of truth.
 
-This is the pillar with the widest range: from publishing what happens in one domain so that others can react, to making the events the only thing you store.
+What these forms share is a shift in focus. Most software describes the state: how things are now. An event-driven system describes the changes to that state.
 
-## Storing state, or recording what happened
+## Storing state changes
 
-Take the customer's address. In most systems it is a column in a table, updated when the customer moves, and the old address is gone. An event-driven system records the move instead: this customer moved house, to this address, on this date. Nothing is overwritten. The current address follows from the latest move, and where the customer lived last year is still there.
+Take the customer's address. In most systems it is a column in a table, updated when the customer moves, and the old address is gone. An event-driven system describes the move instead: this customer moved house, to this address, on this date. The current address follows from the latest move.
 
 <StateHistoryFigure />
 
-Storing state is enough for a lot of software, but the questions a business asks are mostly about what happened. How many customers moved last quarter? A system that stores state can't answer them, because the update destroyed the information. The idea is not new: an accountant doesn't overwrite the balance, but adds an entry to the ledger, which is trusted because nothing in it is ever lost.
+Storing state is enough for a great deal of software, but the questions a business asks are mostly about what happened. How many customers moved last quarter? A system that only stores state cannot answer that, because every update destroyed information. The idea is old. An accountant does not overwrite the balance, but adds an entry to the ledger, and the ledger is trusted because nothing in it is ever lost.
+
+Event-driven does not mean that the events are kept. A system can react to every event, store the new state and discard the event. It then remains state-based at heart, but the step to [keeping the events](#keeping-the-events) is a small one.
 
 ## What makes a good event
 
-An event is a fact, and everything else follows from that.
+An event is a fact, and every other property follows from that.
 
-**It is named after what happened, in the past tense, in the words of the business.** Order placed. Payment received. Parcel handed to carrier, not `ShipmentDispatched`, if that is what the warehouse says. The names of your events are the vocabulary of the system, and a good one lasts for years. In an event storming workshop, the business and the engineers write down everything that happens in the business on sticky notes. That wall of notes in the past tense is the first draft of your events.
+**It is named after what happened, in the past tense, in the words of the business.** Order placed. Payment received. Parcel handed to carrier, if that is the warehouse's own term. The names of the events form the vocabulary of the system. In an event storming workshop, the business and the engineers map a domain together. They write the events that matter within one [bounded context](/domain-isolation#bounded-contexts) on sticky notes. That wall of notes in the past tense is the first draft of the events.
 
 **It carries what happened, not everything.** A move carries the customer's identifier, the new address and the date, not the whole customer record. Anything else it refers to [by identifier](/domain-isolation#contexts-do-not-overlap).
 
-**It never changes.** A wrong fact is corrected by a new event, the way an accountant reverses an entry instead of erasing it. Anything that can be edited afterwards is state, not history.
+**It never changes.** A wrong fact is corrected by a new event, a **compensating event**, in the way an accountant reverses an entry instead of erasing it. Anything that can be edited afterwards is state, not history.
 
-**It is not a command.** A command asks for something to happen and can be refused: place this order. An event records that something did happen, and is addressed to nobody in particular. Publish "ship order" as an event, and you are telling other domains what to do.
+## Commands, queries and events
 
-## Telling instead of asking
+Many event-driven systems separate two responsibilities. A **command** asks for a change: place this order. A **query** asks for information: which orders did this customer place? **Command query responsibility segregation**, or CQRS, gives each of them a model of its own.
 
-Events matter most at the boundary between two domains. When a customer places an order, Shipping has to prepare a shipment. Checkout can call Shipping and ask for one, but then Checkout has to know that Shipping exists and what it needs, and Payments and the warehouse each add one more call. Or Checkout publishes what happened, an order was placed, and Shipping listens. Then listeners come and go without Checkout knowing.
+The **command model** decides whether a command is allowed and, if it is, records the change and publishes it as an event. The **query model** answers questions, in whatever shape suits them best, and keeps itself up to date by reacting to those events. Several query models can read the same events, including query models in other domains. A read-only copy that another domain keeps, as [Domain isolation](/domain-isolation#contexts-do-not-overlap) allows, is a query model of this kind.
 
-<AskListenFigure />
+The two models could share a database. We let them communicate through events, so the command model need not know who reads its changes.
 
-The difference is who depends on whom. With a call, the domain where something happens depends on every domain that has to react. With an event, the reactions depend on the fact, and the domain that produced it depends on nobody. That is what travels between the circles on the [overview](/): facts, which others can use without reaching inside.
+A question that needs an immediate answer, such as whether a card is valid, is no reason to abandon events. It is a query, answered at once by a query model that events keep current.
 
-The same mechanism feeds copies. Domain isolation [allows](/domain-isolation#contexts-do-not-overlap) Shipping a copy of the delivery address as long as Customers stays the source of truth, and events keep it fresh: Shipping handles every move, and rebuilds the copy from the events when it is wrong.
+### Eventual consistency
 
-### A moment later
+A query model reacts after the event, so there may be a delay before a change can be read. During that interval, the checkout domain knows about an order that the customer's order history does not yet show. This is **eventual consistency**: every model arrives at the same picture, but not at the same instant.
 
-The reaction happens after the event, so for a moment Checkout knows about an order that Shipping hasn't seen yet. This is called **eventual consistency**: every part arrives at the same picture, but not at the same instant.
-
-Sounds like a weakness? The business has always worked this way: the warehouse picks the parcel hours after the order is placed, and nobody calls that an inconsistency. Ask at each boundary how long the business can live with the gap. Where the answer is "not at all", the two belong in one domain.
-
-### Making sure it arrives
-
-An event that is published and lost is worse than no event, because the publisher believes the rest of the system knows. So write the event to the database in the same transaction as the change, and let a separate process publish it from there, the **outbox pattern**. A publisher that is unsure retries, so a listener has to be **idempotent**: handling an event twice has the same result as handling it once. And keep everything that must stay in order in one stream, such as one order's events.
+The business has always worked this way. The warehouse picks a parcel hours after the order is placed, and nobody regards that as an inconsistency. The question to ask at every boundary is how long a delay the business can accept.
 
 ## Keeping the events
 
-So far the events have been messages that could be thrown away once everyone has read them. The next step is to keep every event, permanently, in the order it happened. The events become the record, and everything else a view of that record.
+So far, the events have been messages, discarded once every reader has handled them. The next step is to keep every event, permanently, in the order in which it happened.
 
-Any table can then be rebuilt from them. The order overview, the sales per day and the search index are each a different reading of the same events. Such a table is a **projection**: a shape of the data made for one kind of question, and disposable.
+That step changes what counts as the record. Once the events are kept, they hold the complete history, and every table can become a **projection**: a shape of the data made for one kind of question, which can be discarded and rebuilt from the events at any time. The order overview, the sales per day and the search index are each a different reading of the same events.
 
 <ViewsFigure />
 
-When the business wants a report it never asked for, you write the projection and let it read the events from the beginning, so the report is complete on the day it is built. And the audit trail is free, because the primary record is a log.
+When the business asks for a report it never asked for before, a new projection reads the events from the beginning, and the report is complete on the day it is built, last year included. The history also serves as an audit trail, at no extra cost.
 
-### The source of truth
+### Event streaming and event sourcing
 
-The last step is to make the events the only thing a domain writes. To handle a command, the domain replays the events of that order, decides whether the command is allowed, and if so appends new events. The state is never stored, only derived. This is **event sourcing**, and nothing can change without an event saying so.
+In **event sourcing**, a domain uses its own events to decide what it may do next. To handle a command, it reads back the events of, for example, one order, derives the current state from them, decides whether the command is allowed and, if so, adds new events. The events are the source of truth, any state is derived from them, and nothing can change without an event that records it.
 
-Old events never go away, and that is easy to underestimate. The event written in the first year will still be read in the tenth, in whatever shape it had then. An event that leaves a domain is a contract, and everything about versioning in [Specified contracts](/specified-contracts) applies to it.
+Everything else is **event streaming**: events are published and read, and perhaps kept, but the domain makes its decisions on stored state. Every event-sourced domain also streams its events, but a domain that streams events need not be event-sourced.
 
-Event sourcing is a choice per domain, not per system. It pays off where the history is the business: orders, payments, anything that gets disputed. It is overkill for a table of countries.
+Event sourcing is not the goal of an event-driven system. It is one tool among several, and a choice per domain. It pays off where the history is the business itself: orders, payments, anything that may be disputed. For a table of countries, storing the state is enough. The choice is far easier in a system that is already event-driven. A system built on reading and writing tables would have to be redesigned first.
+
+### Events that last
+
+A stored event does not go away. An event written in the first year may seldom be read in the tenth, but it must remain readable, in whatever shape it had when it was written. An event that leaves its domain is a contract, and everything [Specified contracts](/specified-contracts) says about versions and compatibility applies to it.
 
 ## What it asks of a team
 
-Event-driven is a way of thinking before it is a way of building. "What do I call to make this happen" gives way to "what happened, and who needs to know". Names get the care of a public interface from day one, because renaming a published event is a migration. Decide what to do with personal data before the first event with a name in it is written, because the right to be forgotten doesn't sit well with a record that cannot be edited. And you don't need new infrastructure to start: a table of events in the database you already have is a fine first event-driven system.
+Event-driven is a way of thinking before it is a way of building. The question is no longer what to call to make something happen, but what happened. The publisher does not need to know who listens, and it does not matter whether anyone does.
 
-## When request-and-response is the right choice
+The burden moves to the reader. A team that reacts to an event has to understand the context in which it was published, and that is often harder than understanding a request and its response. Names therefore deserve the care of a public interface from the first day, and the events of a system should be documented where every team can find them.
 
-Not everything is an event. "Is this card valid?" is a question that needs an answer now: a request, answered by the domain that owns the data. The choice is how far to go in each part, not between two kinds of system. Our advice: publish the events of every domain, in the past tense and in the words of the business, and keep them. That step is cheap, and expensive to take later, because the history you didn't record is gone.
+Personal data needs a decision before the first event with a name in it is written, because the right to be forgotten does not sit well with a record that cannot be edited. One answer is **crypto-shredding**: personal data in events is encrypted with a key per person, and forgetting that person means destroying the key.
+
+No new infrastructure is needed to begin. A table of events in the database a team already has is a sound first event-driven system.
 
 ## Conclusion
 
-An event is a fact: something that happened, named in the past tense and in the words of the business. Record what happened, and the current state follows from it, along with the answers to questions nobody has asked yet. Domains tell instead of ask: a domain publishes what happened and doesn't know who listens. Keep the events, and every table becomes a view you can throw away and rebuild. Make them the source of truth, and nothing changes without a record. How far you take it is a choice per domain.
+An event is a fact: a change of state, named in the past tense and in the words of the business. An event-driven system with CQRS describes those changes instead of only the state they produce. Its command models publish what happened, and its query models build the views that questions need. That leaves a choice, per domain, of whether to keep the events and whether to make them, rather than the stored state, the source of truth. Whatever each domain chooses, the system remains an event-driven architecture with CQRS.
 
 Events are what travels between the circles. [Domain isolation](/domain-isolation) is about what is inside a circle, [Specified contracts](/specified-contracts) about its edge, and the [overview](/) shows how the three depend on each other.

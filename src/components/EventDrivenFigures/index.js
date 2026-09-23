@@ -3,8 +3,7 @@ import styles from './styles.module.css';
 
 /*
  * Figures for the Event-driven deep dive. They speak the language of the
- * picture on the homepage: a domain is a yellow disc, and an event is a dot
- * that travels between discs.
+ * picture on the homepage, where an event is a dot.
  */
 
 const round = (n) => Math.round(n * 10) / 10;
@@ -41,21 +40,6 @@ function Arrow({x1, y1, x2, y2, head = 10, className}) {
   );
 }
 
-// From just outside one disc to just outside another.
-function between(from, to, gap = 6) {
-  const dx = to.cx - from.cx;
-  const dy = to.cy - from.cy;
-  const distance = Math.hypot(dx, dy);
-  const ux = dx / distance;
-  const uy = dy / distance;
-  return {
-    x1: from.cx + ux * (from.r + gap),
-    y1: from.cy + uy * (from.r + gap),
-    x2: to.cx - ux * (to.r + gap),
-    y2: to.cy - uy * (to.r + gap),
-  };
-}
-
 // A line under a picture that says what it shows.
 function Note({x, y, children}) {
   return (
@@ -71,35 +55,6 @@ function Panel({title, children}) {
       <p className={styles.panelTitle}>{title}</p>
       {children}
     </div>
-  );
-}
-
-// A domain with its name inside.
-function Disc({cx, cy, r, label}) {
-  return (
-    <g>
-      <circle className={styles.disc} cx={cx} cy={cy} r={r} />
-      <text className={styles.discLabel} x={cx} y={cy} dy="0.35em">
-        {label}
-      </text>
-    </g>
-  );
-}
-
-// A domain drawn small, with its name next to or under it.
-function SmallDisc({cx, cy, r, label, labelX, labelY, anchor = 'start'}) {
-  return (
-    <g>
-      <circle className={styles.disc} cx={cx} cy={cy} r={r} />
-      <text
-        className={styles.sideLabel}
-        x={labelX ?? cx + r + 8}
-        y={labelY ?? cy}
-        dy={labelY === undefined ? '0.35em' : 0}
-        textAnchor={anchor}>
-        {label}
-      </text>
-    </g>
   );
 }
 
@@ -179,99 +134,7 @@ export function StateHistoryFigure() {
   );
 }
 
-/* Two ways for the other domains to learn that an order was placed */
-
-const CHECKOUT = {cx: 60, cy: 88, r: 36};
-
-const CALLED = [
-  {cx: 220, cy: 28, r: 16, label: 'Shipping'},
-  {cx: 220, cy: 88, r: 16, label: 'Payments'},
-  {cx: 220, cy: 148, r: 16, label: 'Warehouse'},
-];
-
-const LISTENING = [
-  {cx: 130, cy: 138, r: 16, label: 'Shipping'},
-  {cx: 200, cy: 138, r: 16, label: 'Payments'},
-  {cx: 270, cy: 138, r: 16, label: 'Warehouse'},
-];
-
-const STREAM = {x1: 104, y: 88, x2: 300};
-const TRAVELLING = [112, 165, 235];
-
-export function AskListenFigure() {
-  return (
-    <Figure caption="Two ways for the other domains to learn that an order was placed. On the left Checkout calls each of them. On the right Checkout publishes the fact, and each of them listens.">
-      <div className={styles.panels}>
-        <Panel title="Ask">
-          <svg
-            className={styles.svg}
-            viewBox="0 0 320 206"
-            xmlns="http://www.w3.org/2000/svg"
-            role="img"
-            aria-label="Checkout, drawn as a disc, with three arrows leaving it, one to each of Shipping, Payments and Warehouse.">
-            {CALLED.map((domain) => (
-              <Arrow key={domain.label} {...between(CHECKOUT, domain)} />
-            ))}
-            <Disc {...CHECKOUT} label="Checkout" />
-            {CALLED.map((domain) => (
-              <SmallDisc key={domain.label} {...domain} />
-            ))}
-            <Note x={160} y={196}>
-              Checkout has to know each of them
-            </Note>
-          </svg>
-        </Panel>
-        <Panel title="Listen">
-          <svg
-            className={styles.svg}
-            viewBox="0 0 320 206"
-            xmlns="http://www.w3.org/2000/svg"
-            role="img"
-            aria-label="Checkout, drawn as a disc, with a stream of event dots labelled order placed leaving it. Shipping, Payments and Warehouse each tap into the stream; no arrow runs from Checkout to any of them.">
-            <Arrow
-              className={styles.stream}
-              x1={STREAM.x1}
-              y1={STREAM.y}
-              x2={STREAM.x2}
-              y2={STREAM.y}
-            />
-            <text className={clsx(styles.value, styles.centred)} x={202} y={72}>
-              order placed
-            </text>
-            {TRAVELLING.map((x) => (
-              <circle key={x} className={styles.event} cx={x} cy={STREAM.y} r="5" />
-            ))}
-            {LISTENING.map((domain) => (
-              <line
-                key={domain.label}
-                className={styles.tap}
-                x1={domain.cx}
-                y1={STREAM.y}
-                x2={domain.cx}
-                y2={domain.cy - domain.r - 2}
-              />
-            ))}
-            <Disc {...CHECKOUT} label="Checkout" />
-            {LISTENING.map((domain) => (
-              <SmallDisc
-                key={domain.label}
-                {...domain}
-                labelX={domain.cx}
-                labelY={domain.cy + domain.r + 17}
-                anchor="middle"
-              />
-            ))}
-            <Note x={160} y={196}>
-              Checkout doesn’t know who listens
-            </Note>
-          </svg>
-        </Panel>
-      </div>
-    </Figure>
-  );
-}
-
-/* One record of what happened, and the views derived from it */
+/* The events, and the projections derived from them */
 
 const LOG = {x: 90, top: 30, bottom: 208};
 const RECORDED = [50, 76, 102, 128, 154, 180];
@@ -285,7 +148,7 @@ const VIEW_BOX = {x: 292, width: 160, height: 40};
 export function ViewsFigure() {
   const origin = {x: LOG.x + 18, y: (LOG.top + LOG.bottom) / 2};
   return (
-    <Figure caption="One record of what happened, and three views derived from it. A view can be thrown away and rebuilt from the record at any time.">
+    <Figure caption="The events, and three projections derived from them. A projection can be discarded and rebuilt from the events at any time.">
       <svg
         className={clsx(styles.svg, styles.views)}
         viewBox="0 0 480 230"

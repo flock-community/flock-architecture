@@ -1,16 +1,12 @@
 /*
  * Figures inside a deep dive sit on a square-cornered plate, like the rest of
- * the page. Circles belong to the picture: a domain is a disc, an event a dot.
+ * the page. An event is a dot, as in the picture.
  */
 .figure {
   --f-ink: var(--ifm-font-color-base);
   --f-muted: #5c6866;
   --f-line: #7d8a88;
   --f-faint: #b4c0be;
-  --f-disc: var(--fa-yellow);
-  --f-disc-stroke: #0d0e0d;
-  /* Anything drawn on a disc is on yellow in both colour modes */
-  --f-on-disc: #0d0e0d;
 
   margin: 2rem 0;
   padding: 1.5rem 1.25rem 1.25rem;
@@ -22,7 +18,6 @@
   --f-muted: #a9b5b3;
   --f-line: #6f7d7b;
   --f-faint: #3a4746;
-  --f-disc-stroke: transparent;
 }
 
 .caption {
@@ -61,25 +56,6 @@
   letter-spacing: 0.08em;
   text-align: center;
   text-transform: uppercase;
-}
-
-.disc {
-  fill: var(--f-disc);
-  stroke: var(--f-disc-stroke);
-  stroke-width: 1.5;
-}
-
-.discLabel {
-  fill: var(--f-on-disc);
-  font-size: 13.5px;
-  font-weight: 650;
-  text-anchor: middle;
-}
-
-.sideLabel {
-  fill: var(--f-ink);
-  font-size: 13px;
-  font-weight: 600;
 }
 
 .box {
@@ -124,12 +100,6 @@
   font-size: 14px;
   font-weight: 650;
   text-anchor: middle;
-}
-
-/* Where a listener taps into the stream */
-.tap {
-  stroke: var(--f-line);
-  stroke-width: 1.25;
 }
 
 /* A record in a table */
