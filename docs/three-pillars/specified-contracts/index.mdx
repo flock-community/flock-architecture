@@ -9,13 +9,13 @@ import {EdgeFigure, VersionsFigure} from '@site/src/components/SpecifiedContract
 
 # Specified contracts
 
-Every system that others connect to has an **interface**: what can be asked of it, and what comes back. The system that offers it is the **provider**. Whatever connects to it, usually another system, is a **consumer**. Provider and consumer both rely on an agreement about what crosses the interface. That agreement is a **contract**, and it exists whether or not anyone has specified it. Left unspecified, it is whatever the system happens to do today.
+Every system that others connect to has an **interface**: what can be asked of it, and what comes back. The system that offers it is the **producer**. Whatever connects to it, usually another system, is a **consumer**. Producer and consumer both rely on an agreement about what crosses the interface. That agreement is a **contract**, and it exists whether or not anyone has specified it. Left unspecified, it is whatever the system happens to do today.
 
-A specified contract makes the agreement explicit. It lives in one central place, such as a code repository, where the provider, its consumers and anyone else involved can find it. People read it as documentation, and because it is structured, machines can generate code from it. It always carries a version, so everyone knows which agreement is in force.
+A specified contract makes the agreement explicit. It lives in one central place, such as a code repository, where the producer, its consumers and anyone else involved can find it. People read it as documentation, and because it is structured, machines can generate code from it. It always carries a version, so everyone knows which agreement is in force.
 
 ## Implicit versus specified
 
-Consider the web shop from the [overview](/). The shop's frontend, the part customers see in their browser, shows where their parcel is, and so does a partner's website. Both are consumers of Shipping, the provider. Nobody signed anything, yet both expect Shipping's answers to keep their shape.
+Consider the web shop from the [overview](/). The shop's frontend, the part customers see in their browser, shows where their parcel is, and so does a partner's website. Both are consumers of Shipping, the producer. Nobody signed anything, yet both expect Shipping's answers to keep their shape.
 
 While the contract remains implicit, Shipping is in effect exposing its whole domain, internals included. Nothing says which parts are a promise and which are visible by accident, so consumers build on everything they can reach. The partner's tracking page shows all seven internal steps of a shipment. What has been given away can no longer change freely.
 
@@ -31,7 +31,7 @@ A specification describes the **operations** a system offers to the outside worl
 
 The **protocol**, the way the two sides exchange data, is left open. Web requests, messages or files all qualify, as long as the contract is specified. Whether the specification comes first or last is likewise up to the team, which is why we do not call this pillar "contract first".
 
-The specification has two kinds of reader. People should find it as readable as possible, so that provider and consumers can discuss it. Machines should be able to read it too, so that code on both sides can be generated from it.
+The specification has two kinds of reader. People should find it as readable as possible, so that producer and consumers can discuss it. Machines should be able to read it too, so that code on both sides can be generated from it.
 
 A specification is also a design tool. To describe what a consumer can do, Shipping's team has to think as the teams behind the frontend and the partner's website do, so names and data are chosen with more care.
 
@@ -67,11 +67,11 @@ A contract, however well versioned, does not hold everything. It holds shapes, a
 
 Ordering is the typical case. Shipping's contract also lists a customer's shipments. The list has always come back oldest first, only because the database returned it that way, and the frontend takes the last three items as the customer's recent deliveries. Then Shipping moves to another database, and customers see parcels from years ago. No version changed, and something broke.
 
-This is **Hyrum's Law**: with enough consumers, every observable behaviour will be relied on by somebody. Behaviour that matters therefore belongs in the contract, for example as an input that sets the order, with a stated default. A consumer should rely on nothing the contract does not state. A provider should treat a visible change in behaviour as a change to the contract.
+This is **Hyrum's Law**: with enough consumers, every observable behaviour will be relied on by somebody. Behaviour that matters therefore belongs in the contract, for example as an input that sets the order, with a stated default. A consumer should rely on nothing the contract does not state. A producer should treat a visible change in behaviour as a change to the contract.
 
 ## Conclusion
 
-Every system that others connect to has a contract, and the only choice is whether it is specified. A specified contract lives in one central place, readable by people and machines, and carries a version. Kept small, it leaves everything behind it free to change. Every change is a new version. A non-breaking change, compatible backward and forward, is released silently. A breaking change is announced, and old and new run side by side until the old version is switched off. The provider still has to watch over the behaviour that no contract can hold.
+Every system that others connect to has a contract, and the only choice is whether it is specified. A specified contract lives in one central place, readable by people and machines, and carries a version. Kept small, it leaves everything behind it free to change. Every change is a new version. A non-breaking change, compatible backward and forward, is released silently. A breaking change is announced, and old and new run side by side until the old version is switched off. The producer still has to watch over the behaviour that no contract can hold.
 
 Specified contracts are the edge of the circle. [Domain isolation](/domain-isolation) is about what the edge protects, [Event-driven](/event-driven) about what travels from one edge to the next, and the [overview](/) shows how the three depend on each other.
 
