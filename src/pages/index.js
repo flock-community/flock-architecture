@@ -182,12 +182,17 @@ export default function Home() {
                 How the three fit together
               </Heading>
               <p>
-                Picture a system as circles that never overlap. Domain isolation
-                is the inside of each circle: one part of the business, with one
-                owner. Specified contracts are the edge: the only places where
-                the outside world connects, written down and versioned. Events
-                are what travels in between: facts about what happened, which
-                others can use without reaching inside.
+                A system consists of several bounded contexts, each with one
+                owner. Domain isolation keeps everything inside a bounded
+                context free of the rest of the system. Specified contracts
+                are what a bounded context exposes at its edge, written down
+                and versioned so others know what to expect. Events are
+                shared both within a bounded context and between bounded
+                contexts: domain events travel inside, integration events
+                cross the edge. A bounded context should neither leak its
+                internals out through those events, nor pull another
+                context&apos;s internals in — each stays free to change on
+                its own.
               </p>
               <p>
                 The three protect each other. Without an explicit edge, the
@@ -204,16 +209,17 @@ export default function Home() {
               </Heading>
               <p>
                 Architecture is the set of decisions that are hard to reverse.
-                Programming languages, frameworks and tools change every few
-                years, and replacing them is work you can plan. How you divide a
-                system, what you promise to others and how you deal with history
-                are different. Once a system is in use, they are expensive to
-                undo.
+                A programming language, a framework, a tool — these change
+                every few years, and swapping one out is work you can plan
+                for. How you divide a system, what you promise to others, and
+                how you deal with history is a different story: once a
+                system is live, undoing those decisions gets expensive fast.
               </p>
               <p>
-                So these are the decisions we take a position on. How far you
-                take each of them depends on your situation. It&apos;s about the
-                right choice, not the best one.
+                We see these three as tools in a toolbox, not a rulebook.
+                Every domain is unique and asks for its own approach: how far
+                you take each one depends on your situation. It&apos;s about
+                the right choice, not the best one.
               </p>
             </div>
           </div>
