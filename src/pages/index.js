@@ -16,10 +16,10 @@ const PILLARS = [
     essence: 'Write down what you promise the outside world.',
     body: (
       <>
-        Every system makes promises to the people and systems that use it:
-        which data it offers, and in what shape. If those promises stay
+        Every system makes promises to the people and third-party services that use it:
+        which data it offers, and in what shape. If these stay
         implicit, nobody knows what is safe to change. A specified contract
-        makes them explicit and versioned. You know who relies on what, you
+        makes promises explicit and versioned. You know who relies on what, you
         can announce changes in time, and you stay free to improve everything
         behind the contract.
       </>
@@ -33,12 +33,14 @@ const PILLARS = [
     essence: 'Keep the heart of the business free of everything else.',
     body: (
       <>
-        The domain is what your business does and the rules it follows. In
-        software it takes the form of a model, and we keep that model on its
-        own. It doesn&apos;t depend on a database, a framework or another
-        team&apos;s model. Everything else depends on it. Each part of the
-        business has one owner, and the other parts refer to it by an
-        identifier instead of reaching into its data.
+        The domain captures how your business operates and the rules it follows.
+        The domain model is a representation of the domain. Not all parts of
+        the domain are modelled, only the problems that need to be solved
+        inside the domain — that scope is called a bounded context. Within a
+        bounded context, we stick to consistent names — the same words the
+        business uses. That&apos;s called ubiquitous language, and it means
+        a non-technical person can read the code and still recognise what
+        it&apos;s about.
       </>
     ),
   },
@@ -50,12 +52,14 @@ const PILLARS = [
     essence: 'Record what happened, not only how things are now.',
     body: (
       <>
-        Most systems only store how things are now: the latest address, the
-        latest balance. An event-driven system records what happened, in
-        words everyone understands: an item was added to the cart, a customer
-        moved house. Other parts of the system react to those events and
-        build the view they need. Keep the events, and you keep the full
-        history.
+        Most systems store state: the current situation, like the latest
+        address or the latest balance. Every update overwrites what was
+        there before. An event-driven system stores state changes instead:
+        what happened, in words everyone understands — an item was added to
+        the cart, a customer moved house. Other parts of the system build
+        views from those events, and can always rebuild them, whether a
+        table gets dropped or a new feature needs a different view. The
+        events are the truth; everything else is volatile.
       </>
     ),
   },
