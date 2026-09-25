@@ -36,8 +36,8 @@ const PILLARS = [
         The domain captures how your business operates and the rules it follows.
         The domain model is a representation of the domain. Not all parts of
         the domain are modelled, only the problems that need to be solved
-        inside the domain — that scope is called a bounded context. Within a
-        bounded context, we stick to consistent names — the same words the
+        inside the domain. That scope is called a bounded context. Within a
+        bounded context, we stick to consistent names, the same words the
         business uses. That&apos;s called ubiquitous language, and it means
         a non-technical person can read the code and still recognise what
         it&apos;s about.
@@ -55,7 +55,7 @@ const PILLARS = [
         Most systems store state: the current situation, like the latest
         address or the latest balance. Every update overwrites what was
         there before. An event-driven system stores state changes instead:
-        what happened, in words everyone understands — an item was added to
+        what happened, in words everyone understands. An item was added to
         the cart, a customer moved house. Other parts of the system build
         views from those events, and can always rebuild them, whether a
         table gets dropped or a new feature needs a different view. The
@@ -191,8 +191,8 @@ export default function Home() {
                 contexts: domain events travel inside, integration events
                 cross the edge. A bounded context should neither leak its
                 internals out through those events, nor pull another
-                context&apos;s internals in — each stays free to change on
-                its own.
+                context&apos;s internals in. That way each stays free to
+                change on its own.
               </p>
               <p>
                 The three protect each other. Without an explicit edge, the
@@ -209,7 +209,7 @@ export default function Home() {
               </Heading>
               <p>
                 Architecture is the set of decisions that are hard to reverse.
-                A programming language, a framework, a tool — these change
+                A programming language, a framework, a tool: these change
                 every few years, and swapping one out is work you can plan
                 for. How you divide a system, what you promise to others, and
                 how you deal with history is a different story: once a
