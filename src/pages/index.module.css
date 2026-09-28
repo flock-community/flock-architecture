@@ -51,12 +51,17 @@
 
 /* The picture never gets smaller than it can be read. On narrower screens it
    stays this wide and shows its middle; the hero clips the rest. */
-.sceneWrap svg {
+.sceneWrap .sceneWide {
   --scene-min: 900px;
 
   width: max(100%, var(--scene-min));
   max-width: none;
   margin-left: calc((100% - max(100%, var(--scene-min))) / 2);
+}
+
+/* On a phone even the middle is too wide, so a compact picture takes over. */
+.sceneWrap .sceneCompact {
+  display: none;
 }
 
 /* The pillars */
@@ -335,5 +340,15 @@
 
   .sceneWrap {
     margin-top: 2rem;
+  }
+
+  .sceneWrap .sceneWide {
+    display: none;
+  }
+
+  .sceneWrap .sceneCompact {
+    display: block;
+    max-width: 30rem;
+    margin: 0 auto;
   }
 }
