@@ -49,17 +49,17 @@ const PILLARS = [
     to: '/event-driven',
     highlight: 'between',
     deepDive: 'What events give you',
-    essence: 'Record what happened, not only how things are now.',
+    essence: 'Share what happened, not how things are now.',
     body: (
       <>
-        Most systems store state: the current situation, like the latest
-        address or the latest balance. Every update overwrites what was
-        there before. An event-driven system stores state changes instead:
-        what happened, in words everyone understands. An item was added to
-        the cart, a customer moved house. Other parts of the system build
-        views from those events, and can always rebuild them, whether a
-        table gets dropped or a new feature needs a different view. The
-        events are the truth; everything else is volatile.
+        Most systems pass state around: one part asks another for the
+        current situation, like the latest address or the latest balance.
+        An event-driven system communicates state changes instead: what
+        happened, in words everyone understands. An item was added to the
+        cart, a customer moved house. The part where it happened publishes
+        the event without knowing who listens. Every other part reacts in
+        its own way and keeps the view it needs. A new listener can join
+        without the sender changing at all.
       </>
     ),
   },
