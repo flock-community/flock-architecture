@@ -155,7 +155,8 @@ export default function Home() {
           </p>
         </div>
         <div className={clsx('container', styles.sceneWrap)}>
-          <HeroScene />
+          <HeroScene className={styles.sceneWide} />
+          <HeroScene compact className={styles.sceneCompact} />
         </div>
       </header>
 

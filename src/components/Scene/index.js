@@ -178,7 +178,34 @@ const SHOP_CALLOUTS = [
   },
 ];
 
-export function HeroScene({className}) {
+// On a phone the whole shop won't fit at a readable size, so the compact
+// picture keeps three of its parts, moved closer together.
+const COMPACT_SHOP_DOMAINS = [
+  {id: 'customers', label: 'Customers', cx: 95, cy: 330, r: 66},
+  {id: 'checkout', label: 'Checkout', cx: 270, cy: 130, r: 92},
+  {id: 'payments', label: 'Payments', cx: 445, cy: 340, r: 60},
+];
+
+const COMPACT_SHOP_LINKS = [
+  ['customers', 'checkout'],
+  ['checkout', 'payments'],
+];
+
+export function HeroScene({compact = false, className}) {
+  if (compact) {
+    return (
+      <Scene
+        className={className}
+        onBlack
+        viewBox="0 10 534 418"
+        domains={COMPACT_SHOP_DOMAINS}
+        links={COMPACT_SHOP_LINKS}
+        showLabels
+        label="Three parts of a web shop drawn as circles that never overlap. Each circle is a domain, the ring around it is its contract, and the dots travelling between the rings are events."
+      />
+    );
+  }
+
   return (
     <Scene
       className={className}
