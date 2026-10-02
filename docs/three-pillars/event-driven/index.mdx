@@ -15,6 +15,8 @@ Martin Fowler, in ["What do you mean by 'Event-Driven'?"](https://martinfowler.c
 
 Reacting to events does not require keeping them: a domain can receive an event, update its tables and discard it. The events are then ephemeral, gone once handled, and the system remains state-based at heart. Keeping them is an optional later step, easy in a system that already publishes them.
 
+Event-driven is a choice, not a requirement. We don't think every system has to be built this way, and [When it pays off](#when-it-pays-off) explains how we decide.
+
 ## Storing state changes
 
 The customer's address is usually a column in a table, overwritten when the customer moves. In a system that keeps its events, the move itself is recorded and the old address is not lost. The current address follows from the latest move, and last year's address is still on record.
@@ -79,8 +81,18 @@ Personal data poses a problem, because an immutable event cannot be deleted. The
 
 Starting with events requires no new infrastructure. A table of events in the database the team already has is a sound place to begin.
 
+## When it pays off
+
+The benefits of event-driven are large, but so are the costs. A team has to think in events, listeners carry more of the work, and copies of data catch up a moment later instead of right away. So we weigh it per system, and often per domain.
+
+It pays off when a system has to last, and when the business wants to know what happened, not just how things are now. Reports on last year, an audit trail, a question nobody foresaw: the events answer them. It also pays off when many parts of a system react to the same change. One event serves every listener, and a new listener changes nothing for the sender.
+
+It costs more than it brings when a system is small, one team owns all of it, and its data has no history worth keeping. A screen full of settings, or the list of countries from earlier, is better off with a plain table. A direct call is easier to follow than an event, and a table that is always up to date is easier to reason about than a copy that catches up.
+
+You don't have to decide for the whole system at once. A domain that starts with plain tables can start publishing events later, when a listener turns up that needs them.
+
 ## Conclusion
 
-An event-driven system describes state changes instead of state, and reacts to them. Each event is a fact, named in the past tense and in the words of the business. With CQRS, one model decides on commands, another answers queries, and events carry the changes between them. Such a system gives each domain the option to store what happened instead of the state that followed, and whichever way each domain decides, the architecture remains the same: event-driven, with CQRS.
+An event-driven system describes state changes instead of state, and reacts to them. Each event is a fact, named in the past tense and in the words of the business. With CQRS, one model decides on commands, another answers queries, and events carry the changes between them. Each domain can then choose to keep its events, and even to make them its source of truth. Event-driven is a choice, not a requirement. It pays off most in systems that have to last and have to answer questions about the past.
 
 Events are what travels between the circles. [Domain isolation](/domain-isolation) is about what is inside a circle, [Specified contracts](/specified-contracts) about its edge, and the [overview](/) shows how the three depend on each other.

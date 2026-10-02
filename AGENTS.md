@@ -20,7 +20,7 @@ If you think the site needs content that fits none of the three pillars, raise i
 
 ## Site structure
 
-The site starts with an overview of the three pillars. A visitor first sees what the three concepts are, in a few sentences each, and how they fit together. From the overview, the visitor can dive into each pillar, and each pillar has its own deep dive. In the menu the three deep dives sit together in a section called "Three pillars" (`docs/three-pillars/`, one folder per pillar).
+The site starts with an overview of the three pillars. A visitor first sees what the three concepts are, in a few sentences each, how they fit together, who the site is for and how far to take each pillar. From the overview, the visitor can dive into each pillar, and each pillar has its own deep dive. In the menu the three deep dives sit together in a section called "Three pillars" (`docs/three-pillars/`, one folder per pillar).
 
 After the deep dives come two more sections, "Study material" and "Tools". Neither is a fourth topic, and neither explains a concept. Study material points to material in which the concepts can be seen at work, and Tools describes the tools Flock built to put a pillar into practice, each with a page per item.
 
@@ -47,14 +47,18 @@ Two places point into the section and say no more than needed. The overview page
 The Tools section (`docs/tools/`) has one page per tool that Flock built to put a pillar into practice: Wirespec for Specified contracts, KMapper for Domain isolation. It is not a fourth pillar. The section supports the pillars and stays out of the overview.
 
 - **Every tool page names the pillar it serves** and links to that deep dive.
-- **The link runs one way.** The overview and the deep dives never name a tool, not even in passing: the ideas stand on their own, and a reader of "Specified contracts" must not find Wirespec there. That includes the study material listed at the end of a deep dive: say what the material shows without naming the tool it uses. Pillars link to pillars, tools link to pillars.
+- **The link runs one way.** The overview and the deep dives never name a tool, not even in passing: the ideas stand on their own, and a reader of "Specified contracts" must not find Wirespec there. That includes the study material listed at the end of a deep dive: say what the material shows without naming the tool it uses. Pillars link to pillars, tools link to pillars. The rule is about the tools Flock built. An open standard, such as OpenAPI for describing web APIs, may be named in a deep dive as an example, to show that any format will do.
 - **Study material pages may name a tool**, since they describe what a repository or a workshop is built with. Link the first mention to the tool's page.
 - **A tool page explains what the tool is, what it brings and where it fits.** Installation and usage detail belongs on the tool's own site, which the page links to.
 - **A new tool gets a page of its own** in `docs/tools/`, with a `slug` under `/tools/`, and an entry in the list on the section's index page.
 
 ## Audience and tone
 
-The readers are software engineers and managers, and every page has to work for both. A manager without a programming background should be able to follow it. An engineer should still find it accurate and worth reading.
+The primary readers are developers who are taking the step from writing code to shaping a system, often while they are still getting to grips with domain-driven design. With AI tools writing more of the code, developers meet architecture decisions sooner than they used to, and those decisions are hard and expensive to reverse. The site is there to help them make those decisions well.
+
+Managers read along, so every page has to work for them too. A manager without a programming background should be able to follow it. An experienced engineer should still find it accurate and worth reading, and should be able to see quickly where Flock takes a position of its own on top of domain-driven design. The overview says who the site is for and which choices are Flock's own.
+
+The ideas are independent of technology. No page may suggest that a pillar needs a particular language, framework or tool.
 
 So the site is a high-level explanation of concepts, not a technical manual:
 
