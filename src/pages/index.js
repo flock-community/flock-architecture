@@ -151,7 +151,8 @@ export default function Home() {
           <p className={styles.heroLead}>
             The only constant in software is change. At Flock we build on
             three ideas that keep a system easy to change, long after its
-            first release.
+            first release. We wrote them down for developers who are taking
+            the step from writing code to shaping a system.
           </p>
         </div>
         <div className={clsx('container', styles.sceneWrap)}>
@@ -213,14 +214,61 @@ export default function Home() {
                 A programming language, a framework, a tool: these change
                 every few years, and swapping one out is work you can plan
                 for. How you divide a system, what you promise to others, and
-                how you deal with history is a different story: once a
-                system is live, undoing those decisions gets expensive fast.
+                how you deal with history is a different story. Once a system
+                is live, undoing those decisions gets expensive fast.
+              </p>
+              <p>
+                That&apos;s also why none of the three depends on a particular
+                language, framework or tool. You can apply them with whatever
+                you already use.
               </p>
               <p>
                 We see these three as tools in a toolbox, not a rulebook.
-                Every domain is unique and asks for its own approach: how far
-                you take each one depends on your situation. It&apos;s about
-                the right choice, not the best one.
+                Every domain is unique and asks for its own approach, so how
+                far you take each one depends on your situation. Domain
+                isolation is the one we compromise on least. Event-driven is
+                the one to weigh most carefully. Its benefits are large, and
+                so are its costs. It&apos;s about the right choice, not the
+                best one.
+              </p>
+            </div>
+            <div>
+              <Heading as="h2" className={styles.proseTitle}>
+                Who this is for
+              </Heading>
+              <p>
+                AI tools have made code cheap to write. The decisions behind
+                the code haven&apos;t become any cheaper. If you build software
+                today, you meet those decisions sooner and more often than
+                developers used to. A wrong one costs your organisation a lot,
+                and often you only find out years later.
+              </p>
+              <p>
+                We wrote this site for developers who are taking that step,
+                from writing code to shaping a system. Maybe you know the terms
+                of domain-driven design but haven&apos;t applied them yet. Or you
+                have, and you want to explain them to your team. If you manage
+                a team, you should be able to follow along too.
+              </p>
+            </div>
+            <div>
+              <Heading as="h2" className={styles.proseTitle}>
+                Built on domain-driven design
+              </Heading>
+              <p>
+                Much of what you&apos;ll read here builds on domain-driven
+                design, the approach Eric Evans described in 2003 for shaping
+                software after the business it serves. We don&apos;t hide that.
+                What we add is a choice: which of its ideas matter most in
+                practice, and how far to take them.
+              </p>
+              <p>
+                A few of those choices stand out. We care that a contract is
+                written down, not that it&apos;s written first. We start a new
+                service with the domain and its tests, before there&apos;s a
+                database or an API. We give every piece of data one owner, and
+                let events carry it to whoever else needs it. And we treat
+                keeping every event as an option per domain, not as the goal.
               </p>
             </div>
           </div>
