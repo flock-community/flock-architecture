@@ -152,7 +152,8 @@ export default function Home() {
             The only constant in software is change. At Flock we build on
             three ideas that keep a system easy to change, long after its
             first release. We wrote them down for developers who are taking
-            the step from writing code to shaping a system.
+            the step from writing code to shaping a system, and for the
+            business people they shape it with.
           </p>
         </div>
         <div className={clsx('container', styles.sceneWrap)}>
@@ -202,7 +203,9 @@ export default function Home() {
                 away is hard to take back. With a contract in place, the inside
                 can change faster than the outside. And because others build
                 what they need from events, the owner of the data stays the
-                single source of truth.
+                single source of truth. A domain that publishes what happened
+                doesn&apos;t need to know who listens, so events help a lot in
+                keeping domains apart.
               </p>
             </div>
             <div>
@@ -247,8 +250,14 @@ export default function Home() {
                 We wrote this site for developers who are taking that step,
                 from writing code to shaping a system. Maybe you know the terms
                 of domain-driven design but haven&apos;t applied them yet. Or you
-                have, and you want to explain them to your team. If you manage
-                a team, you should be able to follow along too.
+                have, and you want to explain them to your team.
+              </p>
+              <p>
+                You don&apos;t take that step alone. A good domain model comes
+                out of a conversation between people with questions, the
+                developers, and people with answers, the business. So this site
+                is just as much for the business, and for the managers on both
+                sides who make room for that conversation.
               </p>
             </div>
             <div>

@@ -54,9 +54,9 @@ The Tools section (`docs/tools/`) has one page per tool that Flock built to put 
 
 ## Audience and tone
 
-The primary readers are developers who are taking the step from writing code to shaping a system, often while they are still getting to grips with domain-driven design. With AI tools writing more of the code, developers meet architecture decisions sooner than they used to, and those decisions are hard and expensive to reverse. The site is there to help them make those decisions well.
+The site speaks first to developers who are taking the step from writing code to shaping a system, often while they are still getting to grips with domain-driven design. With AI tools writing more of the code, developers meet architecture decisions sooner than they used to, and those decisions are hard and expensive to reverse. The site is there to help them make those decisions well.
 
-Managers read along, so every page has to work for them too. A manager without a programming background should be able to follow it. An experienced engineer should still find it accurate and worth reading, and should be able to see quickly where Flock takes a position of its own on top of domain-driven design. The overview says who the site is for and which choices are Flock's own.
+Developers don't take that step alone. A good domain model is the result of a collaboration between people with questions, the developers, and people with answers, the business. An event storming session needs both, and the management on both sides makes room for it. So the site is just as much for business people and for managers, and every page has to work for them too. A reader without a programming background should be able to follow it. An experienced engineer should still find it accurate and worth reading, and should be able to see quickly where Flock takes a position of its own on top of domain-driven design. The overview says who the site is for and which choices are Flock's own.
 
 The ideas are independent of technology. No page may suggest that a pillar needs a particular language, framework or tool.
 

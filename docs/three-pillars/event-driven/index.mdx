@@ -15,7 +15,7 @@ Martin Fowler, in ["What do you mean by 'Event-Driven'?"](https://martinfowler.c
 
 Reacting to events does not require keeping them: a domain can receive an event, update its tables and discard it. The events are then ephemeral, gone once handled, and the system remains state-based at heart. Keeping them is an optional later step, easy in a system that already publishes them.
 
-Event-driven is a choice, not a requirement. We don't think every system has to be built this way, and [When it pays off](#when-it-pays-off) explains how we decide.
+Event-driven is a choice, not a requirement. It helps a lot, not least in keeping domains apart, but we don't think every system has to be built this way. [When it pays off](#when-it-pays-off) explains how we decide.
 
 ## Storing state changes
 
@@ -51,6 +51,8 @@ The query model updates after the event, so for a short time the command model k
 
 Shipping's copy of the address is updated a moment after the customer confirms the move, and a moment is of no consequence to a parcel that leaves tomorrow.
 
+Sounds like a weakness? Businesses have always worked this way. A form handed in at one desk reached the next department a day later, and nobody stopped working in the meantime. Event-driven doesn't create eventual consistency. It makes it visible.
+
 ## Keeping the events
 
 A domain may also keep every event, permanently and in order, instead of discarding it once handled.
@@ -71,9 +73,9 @@ In **event sourcing**, a domain takes its decisions from its own events. To hand
 
 Event sourcing is not the destination but one tool among several, chosen per domain. It fits orders and payments, where the history is the business, and is excessive for a list of countries, where a table of state is enough. Where every change is already recorded as an event, the step is within reach. In a system that stores only state, event sourcing is far harder to add and usually means a redesign.
 
-## What it asks of a team
+## What it asks of an organisation
 
-Event-driven is a way of thinking before it is a way of building. The question is no longer which system to call to make something happen, but what has happened. A domain publishes its events without regard to who needs to know, and if nobody listens, no harm is done.
+Event-driven is a way of thinking before it is a way of building. The question is no longer which system to call to make something happen, but what has happened. That goes for the whole company, not just the developers. The business names the events, so everyone learns to talk about what happened. A domain publishes its events without regard to who needs to know, and if nobody listens, no harm is done.
 
 The effort moves from publisher to listener, who has to know the circumstances in which an event was published. Building a projection requires understanding much of the system, which is often harder than understanding an interface and its data. The name of an event therefore deserves the care of a public interface, because renaming a published event is a migration: every listener has to change with it. A system's events also have to be documented or discoverable.
 
@@ -83,11 +85,11 @@ Starting with events requires no new infrastructure. A table of events in the da
 
 ## When it pays off
 
-The benefits of event-driven are large, but so are the costs. A team has to think in events, listeners carry more of the work, and copies of data catch up a moment later instead of right away. So we weigh it per system, and often per domain.
+The benefits of event-driven are large, but so are the costs. The whole company has to learn to think in events, and listeners carry more of the work. So we weigh it per system, and often per domain.
 
-It pays off when a system has to last, and when the business wants to know what happened, not just how things are now. Reports on last year, an audit trail, a question nobody foresaw: the events answer them. It also pays off when many parts of a system react to the same change. One event serves every listener, and a new listener changes nothing for the sender.
+It pays off when a system has to last, and when the business wants to know what happened, not just how things are now. Reports on last year, an audit trail, a question nobody foresaw: the events answer them. It also pays off when many parts of a system react to the same change. One event serves every listener, and a new listener changes nothing for the sender. That is also why events help so much in keeping domains apart, which [Domain isolation](/domain-isolation#contexts-do-not-overlap) asks for.
 
-It costs more than it brings when a system is small, one team owns all of it, and its data has no history worth keeping. A screen full of settings, or the list of countries from earlier, is better off with a plain table. A direct call is easier to follow than an event, and a table that is always up to date is easier to reason about than a copy that catches up.
+It costs more than it brings when a system is small, one team owns all of it, and its data has no history worth keeping. A screen full of settings, or the list of countries from earlier, is better off with a plain table. A direct call is easier to follow than an event.
 
 You don't have to decide for the whole system at once. A domain that starts with plain tables can start publishing events later, when a listener turns up that needs them.
 
