@@ -8,25 +8,29 @@ import styles from './styles.module.css';
  *   inside   the disc               Domain isolation
  *   edge     the ring and its ports Specified contracts
  *   between  the travelling dots    Event-driven
- *            and the event store
+ *            and the stores
  *
  * `highlight` lights one of these roles and dims the other two.
  */
 
 const round = (n) => Math.round(n * 10) / 10;
 
+// Every domain keeps its events in a store of its own, drawn as a small
+// database cylinder.
+const STORE_WIDTH = 44;
+const STORE_HEIGHT = 38;
+const STORE_CAP = 6;
 const STORE_GAP = 10;
-const STORE_CAP = 12;
 
 // Whether a point, relative to the centre of a store, lies inside its
 // cylinder. The lid and the base curve, so the height depends on x.
-function insideStore({w, h}, x, y) {
-  const rx = w / 2;
+function insideStore(x, y) {
+  const rx = STORE_WIDTH / 2;
   if (Math.abs(x) > rx) {
     return false;
   }
   const curve = STORE_CAP * Math.sqrt(1 - (x / rx) ** 2);
-  return Math.abs(y) <= h / 2 - STORE_CAP + curve;
+  return Math.abs(y) <= STORE_HEIGHT / 2 - STORE_CAP + curve;
 }
 
 // How far from its centre a link leaves a node, in direction (ux, uy). A
@@ -34,7 +38,7 @@ function insideStore({w, h}, x, y) {
 function reach(node, ux, uy, ringGap) {
   if (node.store) {
     let t = 0;
-    while (insideStore(node, ux * t, uy * t)) {
+    while (insideStore(ux * t, uy * t)) {
       t += 0.5;
     }
     return t + STORE_GAP;
@@ -43,7 +47,7 @@ function reach(node, ux, uy, ringGap) {
 }
 
 // A link runs from the contract ring of one domain to the ring of another,
-// or to an event store.
+// or to the domain's own store.
 function linkGeometry(from, to, ringGap) {
   const dx = to.cx - from.cx;
   const dy = to.cy - from.cy;
@@ -54,43 +58,31 @@ function linkGeometry(from, to, ringGap) {
   const y1 = from.cy + uy * reach(from, ux, uy, ringGap);
   const x2 = to.cx - ux * reach(to, ux, uy, ringGap);
   const y2 = to.cy - uy * reach(to, ux, uy, ringGap);
-  return {
-    x1,
-    y1,
-    x2,
-    y2,
-    length: Math.hypot(x2 - x1, y2 - y1),
-    port1: !from.store,
-    port2: !to.store,
-  };
+  // A domain's own store is private, so it is not reached through a port.
+  const ports = !from.store && !to.store;
+  return {x1, y1, x2, y2, length: Math.hypot(x2 - x1, y2 - y1), ports};
 }
 
 // A database drawn as a cylinder: a body, its lid, and one band below it.
-function Store({cx, cy, w, h, label, showLabel}) {
-  const left = cx - w / 2;
-  const right = cx + w / 2;
-  const top = cy - h / 2 + STORE_CAP;
-  const bottom = cy + h / 2 - STORE_CAP;
-  const rx = w / 2;
-  const arc = (y) =>
-    `M ${left} ${y} A ${rx} ${STORE_CAP} 0 0 0 ${right} ${y}`;
+function Store({cx, cy}) {
+  const left = cx - STORE_WIDTH / 2;
+  const right = cx + STORE_WIDTH / 2;
+  const top = cy - STORE_HEIGHT / 2 + STORE_CAP;
+  const bottom = cy + STORE_HEIGHT / 2 - STORE_CAP;
+  const rx = STORE_WIDTH / 2;
+  const arc = `A ${rx} ${STORE_CAP} 0 0 0`;
+  const curve = (y) => `M ${left} ${y} ${arc} ${right} ${y}`;
   return (
     <g>
       <path
         className={styles.storeBody}
-        d={`M ${left} ${top} L ${left} ${bottom} A ${rx} ${STORE_CAP} 0 0 0 ${right} ${bottom} L ${right} ${top} A ${rx} ${STORE_CAP} 0 0 0 ${left} ${top} Z`}
+        d={`M ${left} ${top} L ${left} ${bottom} ${arc} ${right} ${bottom} L ${right} ${top} ${arc} ${left} ${top} Z`}
       />
-      <path className={styles.storeLine} d={arc(top)} />
-      <path className={styles.storeLine} d={arc(round(top + (bottom - top) / 3))} />
-      {showLabel && (
-        <text
-          className={styles.storeLabel}
-          x={cx}
-          y={round(cy + (bottom - top) / 6 + STORE_CAP / 2)}
-          dy="0.35em">
-          {label}
-        </text>
-      )}
+      <path className={styles.storeLine} d={curve(top)} />
+      <path
+        className={styles.storeLine}
+        d={curve(round(top + (bottom - top) / 3))}
+      />
     </g>
   );
 }
@@ -166,7 +158,7 @@ function Scene({
       </g>
 
       {stores.map((s) => (
-        <Store key={s.id} {...s} showLabel={showLabels} />
+        <Store key={s.id} {...s} />
       ))}
 
       {domains.map((d) => (
@@ -183,14 +175,12 @@ function Scene({
 
       <g className={styles.ports}>
         {geometry.map((g, i) => (
-          <g key={i}>
-            {g.port1 && (
+          g.ports && (
+            <g key={i}>
               <circle cx={round(g.x1)} cy={round(g.y1)} r={portRadius} />
-            )}
-            {g.port2 && (
               <circle cx={round(g.x2)} cy={round(g.y2)} r={portRadius} />
-            )}
-          </g>
+            </g>
+          )
         ))}
       </g>
 
@@ -218,16 +208,20 @@ function Scene({
 
 // A web shop, the example used throughout the site.
 const SHOP_DOMAINS = [
-  {id: 'customers', label: 'Customers', cx: 150, cy: 200, r: 66},
+  {id: 'customers', label: 'Customers', cx: 150, cy: 235, r: 66},
   {id: 'checkout', label: 'Checkout', cx: 430, cy: 170, r: 92},
   {id: 'payments', label: 'Payments', cx: 640, cy: 318, r: 60},
   {id: 'shipping', label: 'Shipping', cx: 860, cy: 160, r: 78},
   {id: 'warehouse', label: 'Warehouse', cx: 1068, cy: 300, r: 58},
 ];
 
-// The domains also write their events to a database, and read them back.
+// Each domain writes its events to a store of its own.
 const SHOP_STORES = [
-  {id: 'events', label: 'Events', cx: 320, cy: 372, w: 108, h: 84},
+  {id: 'customers-store', cx: 150, cy: 392},
+  {id: 'checkout-store', cx: 330, cy: 330},
+  {id: 'payments-store', cx: 505, cy: 395},
+  {id: 'shipping-store', cx: 720, cy: 60},
+  {id: 'warehouse-store', cx: 1140, cy: 165},
 ];
 
 const SHOP_LINKS = [
@@ -236,9 +230,11 @@ const SHOP_LINKS = [
   ['checkout', 'shipping'],
   ['payments', 'warehouse'],
   ['shipping', 'warehouse'],
-  ['customers', 'events'],
-  ['checkout', 'events'],
-  ['events', 'payments'],
+  ['customers', 'customers-store'],
+  ['checkout', 'checkout-store'],
+  ['payments', 'payments-store'],
+  ['shipping', 'shipping-store'],
+  ['warehouse', 'warehouse-store'],
 ];
 
 // Each callout: a leader line from the thing it names to its label.
@@ -274,15 +270,17 @@ const COMPACT_SHOP_DOMAINS = [
 ];
 
 const COMPACT_SHOP_STORES = [
-  {id: 'events', label: 'Events', cx: 270, cy: 420, w: 100, h: 76},
+  {id: 'customers-store', cx: 95, cy: 482},
+  {id: 'checkout-store', cx: 90, cy: 130},
+  {id: 'payments-store', cx: 445, cy: 486},
 ];
 
 const COMPACT_SHOP_LINKS = [
   ['customers', 'checkout'],
   ['checkout', 'payments'],
-  ['customers', 'events'],
-  ['checkout', 'events'],
-  ['events', 'payments'],
+  ['customers', 'customers-store'],
+  ['checkout', 'checkout-store'],
+  ['payments', 'payments-store'],
 ];
 
 export function HeroScene({compact = false, className}) {
@@ -291,12 +289,12 @@ export function HeroScene({compact = false, className}) {
       <Scene
         className={className}
         onBlack
-        viewBox="0 10 534 458"
+        viewBox="0 10 534 500"
         domains={COMPACT_SHOP_DOMAINS}
         stores={COMPACT_SHOP_STORES}
         links={COMPACT_SHOP_LINKS}
         showLabels
-        label="Three parts of a web shop drawn as circles that never overlap. Each circle is a domain, the ring around it is its contract, and the dots travelling between the rings are events. Events also travel into a database that keeps them, and from there to the parts that read them."
+        label="Three parts of a web shop drawn as circles that never overlap. Each circle is a domain, the ring around it is its contract, and the dots travelling between the rings are events. Each part also writes its events to a database of its own."
       />
     );
   }
@@ -311,7 +309,7 @@ export function HeroScene({compact = false, className}) {
       links={SHOP_LINKS}
       callouts={SHOP_CALLOUTS}
       showLabels
-      label="Five parts of a web shop drawn as circles that never overlap. Each circle is a domain, the ring around it is its contract, and the dots travelling between the rings are events. Events also travel into a database that keeps them, and from there to the parts that read them."
+      label="Five parts of a web shop drawn as circles that never overlap. Each circle is a domain, the ring around it is its contract, and the dots travelling between the rings are events. Each part also writes its events to a database of its own."
     />
   );
 }

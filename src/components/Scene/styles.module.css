@@ -83,7 +83,7 @@
   text-anchor: middle;
 }
 
-/* The event store belongs to the events, so it takes their colour */
+/* A store holds events, so it takes their colour */
 .storeBody {
   fill: var(--c-between);
 }
@@ -94,12 +94,6 @@
   stroke-width: 1.5;
 }
 
-.storeLabel {
-  fill: var(--s-between-ink);
-  font-size: 17px;
-  font-weight: 650;
-  text-anchor: middle;
-}
 
 /* Events. Without motion they rest evenly spaced along their line. */
 .dots circle {
