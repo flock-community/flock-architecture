@@ -9,6 +9,7 @@
   --s-dim-fill: #e3e9e7;
   --s-callout: #0d0e0d;
   --s-callout-line: #7d8a88;
+  --s-between-ink: #ffffff;
 
   display: block;
   width: 100%;
@@ -26,6 +27,7 @@
   --s-dim-fill: #141a19;
   --s-callout: #f1f1f1;
   --s-callout-line: #6f7d7b;
+  --s-between-ink: #070908;
 }
 
 /* Which roles are lit */
@@ -77,6 +79,24 @@
 .domainLabel {
   fill: #0d0e0d;
   font-size: 19px;
+  font-weight: 650;
+  text-anchor: middle;
+}
+
+/* The event store belongs to the events, so it takes their colour */
+.storeBody {
+  fill: var(--c-between);
+}
+
+.storeLine {
+  fill: none;
+  stroke: var(--s-between-ink);
+  stroke-width: 1.5;
+}
+
+.storeLabel {
+  fill: var(--s-between-ink);
+  font-size: 17px;
   font-weight: 650;
   text-anchor: middle;
 }
