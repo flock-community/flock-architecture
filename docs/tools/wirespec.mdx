@@ -51,16 +51,88 @@ Two things follow from generating the code instead of writing it by hand:
 
 Wirespec's own documentation calls this *contract-first*: writing the specification before the code. That order is the natural one for a new interface, but it isn't what the pillar hinges on. What matters is that a specification exists and is the source of truth, and Wirespec serves an existing interface just as well.
 
-You don't have to give up OpenAPI for it either. OpenAPI is the most widely used format for describing web interfaces, and it has a far larger ecosystem of tools than Wirespec. So Wirespec works alongside it. It converts an OpenAPI description, or an Avro schema for messages, into a Wirespec file, so an interface that grew without a readable contract gets one after the fact. And it produces OpenAPI from a Wirespec file for the tools that expect that format.
+## Wirespec and OpenAPI
+
+OpenAPI is the most widely used standard for describing web APIs, and it has a far larger ecosystem of tools than Wirespec. It works fine, and you don't need Wirespec to have a specified contract. So why did we build it?
+
+Because a contract is read far more often than it is written. Here is the to-do contract from above, written in OpenAPI.
+
+<details>
+<summary>The same contract in OpenAPI</summary>
+
+```yaml title="todos.yaml"
+openapi: 3.0.3
+info:
+  title: Todos
+  version: 1.0.0
+paths:
+  /todos:
+    get:
+      operationId: GetTodos
+      responses:
+        "200":
+          description: The to-dos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Todo"
+    post:
+      operationId: CreateTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Todo"
+      responses:
+        "201":
+          description: The created to-do
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "400":
+          description: Why the to-do was refused
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Todo:
+      type: object
+      required: [id, task, done]
+      properties:
+        id:
+          type: integer
+        task:
+          type: string
+        done:
+          type: boolean
+    Error:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+```
+
+</details>
+
+The OpenAPI version says the same thing in about three times as many lines, and most of those lines are structure, not content. That matters most when the contract changes, because every change goes through a review. A new field in Wirespec is one line in a pull request, and the reviewer sees at once what changes for consumers. In OpenAPI the same field takes a few lines, deep in the YAML, plus an entry in a separate list of required fields.
+
+You don't have to give up OpenAPI for Wirespec. It converts an OpenAPI description, or an Avro schema for messages, into a Wirespec file, so an interface that grew without a readable contract gets one after the fact. And it produces OpenAPI from a Wirespec file for the tools that expect that format.
 
 ## What it brings
 
-- **A contract short enough to discuss.** Write the to-do interface above in OpenAPI and it takes more than three times as many lines, nested several levels deep. In Wirespec it fits on a screen, so a team can review it together in a meeting. A product owner or a manager won't write one, but with the few technical terms explained, they can follow it and see whether it says what was agreed.
+- **A contract short enough to review together.** A change shows up in a pull request as a few readable lines, so reviewers see what changes for consumers. A product owner or a manager can follow the contract and check that it says what was agreed.
 - **Both sides start on day one.** The provider and its consumers generate their code from the agreed specification, so the team building a screen doesn't wait for the service behind it to exist.
 - **One specification, many languages.** At a Flock innovation day, a team generated four client libraries for the public interface of a bank, in Java, Kotlin, TypeScript and Python, from a single specification. Each felt native to its language, and all four offered exactly the same operations.
 - **Less repetitive work.** The types and the plumbing for every request and response are generated, so engineers write only the behaviour behind the interface.
 - **Early warning when a change breaks someone.** Consumers find out when they compile, not when they deploy.
-- **Tests that keep up with the contract.** Wirespec generates valid test data from the specification, and stand-ins for the other side of an interface that can only give the answers the contract allows. When the contract changes, a test that no longer fits stops compiling instead of quietly testing something that no longer exists.
+- **Tests that keep up with the contract.** Wirespec generates valid test data and stand-ins for the other side of an interface, which can only give answers the contract allows. When the contract changes, a test that no longer fits stops compiling instead of quietly testing something that no longer exists.
 
 ## Where to go next
 
