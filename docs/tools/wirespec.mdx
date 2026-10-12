@@ -34,7 +34,9 @@ type Error {
 }
 ```
 
-This file says that a to-do has an identifier, a task and a done flag; that a list of them can be fetched from `/todos`; and that a new one can be sent to the same address, which answers either with the created to-do or with an error. Anyone can read it, including people who never write code, and it names everything the two sides need to agree on.
+This file says that a to-do has an identifier, a task and a done flag. A list of them can be fetched from `/todos` (`GET`), and a new one can be sent to the same address (`POST`). The numbers are the standard web status codes: `200` means "here you go", `201` means "created" and `400` means "your request was wrong". It names everything the two sides need to agree on, and nothing else.
+
+A type can also say which values are valid, not just what shape they have. `Integer(0, 1000)` is a whole number between 0 and 1000, and a text field can be tied to a pattern, such as that of an email address. The contract then states the rules that would otherwise live in someone's head or in a comment.
 
 From such a file the Wirespec compiler generates code in the language of each party: Kotlin, Java, TypeScript and Python, among others. The generated code holds the types and, for each endpoint, its request and every response it can give, in a form that the compiler of that language checks. It depends on no library or framework, so it fits into any project and outlives the frameworks around it. Wirespec plugs into the usual build tools, Maven, Gradle and npm, and into IntelliJ IDEA and Visual Studio Code. There is also an online [playground](https://playground.wirespec.io) to try it in.
 
@@ -51,7 +53,7 @@ Wirespec's own documentation calls this *contract-first*: writing the specificat
 
 ## Wirespec and OpenAPI
 
-OpenAPI is the most widely used standard for describing web APIs, and it works fine. You don't need Wirespec to have a specified contract. So why did we build it?
+OpenAPI is the most widely used standard for describing web APIs, and it has a far larger ecosystem of tools than Wirespec. It works fine, and you don't need Wirespec to have a specified contract. So why did we build it?
 
 Because a contract is read far more often than it is written. Here is the to-do contract from above, written in OpenAPI.
 
@@ -119,19 +121,18 @@ components:
 
 </details>
 
-It says the same thing in about three times as many lines, and most of those lines are structure, not content. That matters most when the contract changes, because every change goes through a review. A new field in Wirespec is one line in a pull request, and the reviewer sees at once what changes for consumers. In OpenAPI the same field takes a few lines, deep in the YAML, plus an entry in a separate list of required fields.
+The OpenAPI version says the same thing in about three times as many lines, and most of those lines are structure, not content. That matters most when the contract changes, because every change goes through a review. A new field in Wirespec is one line in a pull request, and the reviewer sees at once what changes for consumers. In OpenAPI the same field takes a few lines, deep in the YAML, plus an entry in a separate list of required fields.
 
-You don't have to choose between the two. Wirespec converts an OpenAPI description into a Wirespec file, so an interface that grew without a contract gets one after the fact. And it produces OpenAPI from a Wirespec file for the tools that expect that format.
+You don't have to give up OpenAPI for Wirespec. It converts an OpenAPI description, or an Avro schema for messages, into a Wirespec file, so an interface that grew without a readable contract gets one after the fact. And it produces OpenAPI from a Wirespec file for the tools that expect that format.
 
 ## What it brings
 
-- **Contract changes that are easy to review.** A change to the contract shows up in a pull request as a few readable lines, so reviewers see what changes for consumers.
-
-- **A contract that non-programmers can read.** A product owner or a manager can read a Wirespec file and check that it says what was agreed.
-- **One source of truth for an interface**, independent of any language, with generated code that is guaranteed to match it.
+- **A contract short enough to review together.** A change shows up in a pull request as a few readable lines, so reviewers see what changes for consumers. A product owner or a manager can follow the contract and check that it says what was agreed.
+- **Both sides start on day one.** The provider and its consumers generate their code from the agreed specification, so the team building a screen doesn't wait for the service behind it to exist.
+- **One specification, many languages.** At a Flock innovation day, a team generated four client libraries for the public interface of a bank, in Java, Kotlin, TypeScript and Python, from a single specification. Each felt native to its language, and all four offered exactly the same operations.
 - **Less repetitive work.** The types and the plumbing for every request and response are generated, so engineers write only the behaviour behind the interface.
 - **Early warning when a change breaks someone.** Consumers find out when they compile, not when they deploy.
-- **A basis for testing.** The specification can drive mock servers and test data, so an implementation can be checked against the contract it claims to follow.
+- **Tests that keep up with the contract.** Wirespec generates valid test data and stand-ins for the other side of an interface, which can only give answers the contract allows. When the contract changes, a test that no longer fits stops compiling instead of quietly testing something that no longer exists.
 
 ## Where to go next
 
