@@ -148,7 +148,7 @@ const VIEW_BOX = {x: 292, width: 160, height: 40};
 export function ViewsFigure() {
   const origin = {x: LOG.x + 18, y: (LOG.top + LOG.bottom) / 2};
   return (
-    <Figure caption="One record of what happened, and three views derived from it. A view can be thrown away and rebuilt from the record at any time.">
+    <Figure caption="One record of what happened, and three views derived from it. A view can be thrown away and rebuilt from the record.">
       <svg
         className={clsx(styles.svg, styles.views)}
         viewBox="0 0 480 230"
@@ -187,6 +187,177 @@ export function ViewsFigure() {
           </g>
         ))}
       </svg>
+    </Figure>
+  );
+}
+
+/* Two questions that are easily confused: how domains are coupled, and what a domain keeps */
+
+// What a domain keeps, from the top row down
+const KEEPS = ['Its history', 'Its state'];
+
+// How domains are coupled, from the left column to the right
+const COUPLED = [
+  {name: 'Tightly coupled', how: ['one calls,', 'the other answers']},
+  {name: 'Loosely coupled', how: ['one publishes,', 'the others react']},
+];
+
+// `title` says what the quadrant combines and `known` is the name it goes by.
+// Both are broken for the narrow picture. The wide one puts each on one line.
+const QUADRANTS = [
+  {col: 0, row: 0, title: ['Calls and', 'history'], known: ['History', 'table']},
+  {col: 1, row: 0, title: ['Events and', 'history'], known: ['Audit log or', 'event sourcing']},
+  {col: 0, row: 1, title: ['Calls and', 'state'], known: ['Request and', 'response']},
+  {col: 1, row: 1, title: ['Events and', 'state'], known: ['Event', 'streaming']},
+];
+
+// Wide: "what a domain keeps" stands left of its row.
+const QUADRANT_WIDE = {
+  wide: true,
+  width: 620,
+  cellX: [140, 379],
+  cellY: [36, 156],
+  cell: {width: 229, height: 110},
+  keepsTitle: {x: 12, y: 20},
+  keepsLabel: (rowTop) => ({x: 12, y: rowTop + 55, dy: '0.35em'}),
+  glyphDy: -30,
+  titleDy: 4,
+  knownDy: 26,
+};
+
+// Narrow: "what a domain keeps" stands above its row, and names break in two.
+const QUADRANT_COMPACT = {
+  wide: false,
+  width: 340,
+  cellX: [20, 180],
+  cellY: [50, 204],
+  cell: {width: 150, height: 120},
+  keepsTitle: {x: 20, y: 16},
+  keepsLabel: (rowTop) => ({x: 20, y: rowTop - 10}),
+  glyphDy: -40,
+  titleDy: -14,
+  knownDy: 26,
+};
+
+const LINE = 16;
+
+// A label of one or more lines, the first on the baseline y.
+function Lines({className, x, y, lines, gap = LINE}) {
+  return (
+    <text className={className} x={x} y={y}>
+      {lines.map((line, i) => (
+        <tspan key={line} x={x} dy={i === 0 ? 0 : gap}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
+// How the two columns talk. A call goes out and an answer comes back. An
+// event is the dot from the homepage, travelling one way.
+function CouplingGlyph({events, x, y}) {
+  if (events) {
+    return (
+      <g>
+        <circle className={styles.event} cx={x - 13} cy={y} r="5.5" />
+        <Arrow x1={x - 3} y1={y} x2={x + 19} y2={y} head={7} />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <Arrow x1={x - 15} y1={y - 4.5} x2={x + 15} y2={y - 4.5} head={7} />
+      <Arrow x1={x + 15} y1={y + 4.5} x2={x - 15} y2={y + 4.5} head={7} />
+    </g>
+  );
+}
+
+function QuadrantChart({layout, className}) {
+  const {wide, cellX, cellY, cell} = layout;
+  const join = (lines) => (wide ? [lines.join(' ')] : lines);
+  const left = cellX[0] - 8;
+  const right = cellX[1] + cell.width;
+  const axisY = cellY[1] + cell.height + 8;
+  const nameY = axisY + 22;
+  const howY = nameY + 18;
+  const titleY = howY + (wide ? 0 : LINE) + 30;
+  return (
+    <svg
+      className={clsx(styles.svg, className)}
+      viewBox={`0 0 ${layout.width} ${titleY + 14}`}
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="A grid of two by two. From left to right: how domains are coupled. Tightly on the left, where one calls and the other answers, and loosely on the right, where one publishes and the others react. From bottom to top: what a domain keeps, its state in the bottom row and its history in the top row. Bottom left is calls and state, known as request and response. Bottom right is events and state, known as event streaming. Top left is calls and history, a history table. Top right is events and history, an audit log or event sourcing.">
+      <line className={styles.axis} x1={left} y1={axisY} x2={left} y2={cellY[0]} />
+      <line className={styles.axis} x1={left} y1={axisY} x2={right} y2={axisY} />
+      <text className={styles.axisTitle} x={layout.keepsTitle.x} y={layout.keepsTitle.y}>
+        What a domain keeps
+      </text>
+      {KEEPS.map((label, row) => (
+        <text key={label} className={styles.axisValue} {...layout.keepsLabel(cellY[row])}>
+          {label}
+        </text>
+      ))}
+      {COUPLED.map((column, col) => {
+        const x = cellX[col] + cell.width / 2;
+        return (
+          <g key={column.name}>
+            <text className={clsx(styles.axisValue, styles.centred)} x={x} y={nameY}>
+              {column.name}
+            </text>
+            <Lines
+              className={clsx(styles.field, styles.centred)}
+              x={x}
+              y={howY}
+              lines={join(column.how)}
+            />
+          </g>
+        );
+      })}
+      <text
+        className={clsx(styles.axisTitle, styles.centred)}
+        x={(cellX[0] + cellX[1] + cell.width) / 2}
+        y={titleY}>
+        How domains are coupled
+      </text>
+      {QUADRANTS.map((quadrant) => {
+        const x = cellX[quadrant.col];
+        const y = cellY[quadrant.row];
+        const cx = x + cell.width / 2;
+        const cy = y + cell.height / 2;
+        const title = join(quadrant.title);
+        return (
+          <g key={title.join(' ')}>
+            <rect className={styles.box} x={x} y={y} width={cell.width} height={cell.height} />
+            <CouplingGlyph events={quadrant.col === 1} x={cx} y={cy + layout.glyphDy} />
+            <Lines
+              className={styles.boxLabel}
+              x={cx}
+              y={cy + layout.titleDy}
+              lines={title}
+              gap={LINE + 1}
+            />
+            <Lines
+              className={clsx(styles.field, styles.centred)}
+              x={cx}
+              y={cy + layout.knownDy}
+              lines={join(quadrant.known)}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+export function QuadrantFigure() {
+  return (
+    <Figure caption="Two separate questions: how domains are coupled, and what a domain keeps. None of the four is wrong. Within one team, calls are fine, and between teams events loosen the coupling. Event-driven is the right-hand column. The top row is a separate choice for each domain.">
+      <div className={styles.quadrant}>
+        <QuadrantChart layout={QUADRANT_WIDE} className={styles.quadrantWide} />
+        <QuadrantChart layout={QUADRANT_COMPACT} className={styles.quadrantCompact} />
+      </div>
     </Figure>
   );
 }
