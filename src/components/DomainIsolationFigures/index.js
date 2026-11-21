@@ -127,21 +127,33 @@ function lens(a, b) {
   return `M${x} ${top} A${a.r} ${a.r} 0 0 0 ${x} ${bottom} A${a.r} ${a.r} 0 0 0 ${x} ${top} Z`;
 }
 
+// Each context has a colour of its own, so that what belongs to the other
+// one stays recognisable wherever it turns up.
 const OVERLAPPING = [
   {label: 'Checkout', cx: 116, cy: 92, r: 68, labelX: 90},
-  {label: 'Shipping', cx: 204, cy: 92, r: 68, labelX: 230},
+  {label: 'Shipping', cx: 204, cy: 92, r: 68, labelX: 230, other: true},
 ];
 
 const ISOLATED = [
-  {label: 'Checkout', cx: 56, cy: 92, r: 50, labelX: 56},
-  {label: 'Shipping', cx: 264, cy: 92, r: 50, labelX: 264},
+  {label: 'Checkout', cx: 56, cy: 92, r: 50, labelX: 50},
+  {label: 'Shipping', cx: 264, cy: 92, r: 50, labelX: 264, other: true},
 ];
+
+// The identifier Checkout holds: inside its own circle, in Shipping's colour,
+// and the point the arrow to Shipping starts from
+const REFERENCE = {cx: 95, cy: 92, r: 6};
 
 function Discs({discs}) {
   return (
     <>
       {discs.map((d) => (
-        <circle key={d.label} className={styles.disc} cx={d.cx} cy={d.cy} r={d.r} />
+        <circle
+          key={d.label}
+          className={clsx(styles.disc, d.other && styles.discOther)}
+          cx={d.cx}
+          cy={d.cy}
+          r={d.r}
+        />
       ))}
     </>
   );
@@ -167,7 +179,7 @@ function DiscLabels({discs}) {
 export function OverlapFigure() {
   const shared = lens(...OVERLAPPING);
   return (
-    <Figure caption="Two bounded contexts that share part of their model, and the same two with only an identifier between them.">
+    <Figure caption="Two bounded contexts that share part of their model, and the same two linked only by an identifier. Checkout holds it, shown as the dot, in Shipping's colour, because the shipment it points to belongs to Shipping.">
       <div className={styles.panels}>
         <div>
           <p className={styles.panelTitle}>Overlap</p>
@@ -207,10 +219,11 @@ export function OverlapFigure() {
             viewBox="0 0 320 210"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
-            aria-label="Two separate circles, Checkout and Shipping. A single arrow labelled shipmentId runs from Checkout to Shipping: only an identifier crosses.">
+            aria-label="Two separate circles, Checkout and Shipping, each in its own colour. A small dot inside Checkout, in Shipping's colour, is the identifier Checkout holds. A single arrow labelled shipmentId runs from that dot to Shipping: only an identifier crosses.">
             <Discs discs={ISOLATED} />
             <DiscLabels discs={ISOLATED} />
-            <Arrow x1={114} y1={92} x2={206} y2={92} />
+            <circle className={styles.reference} {...REFERENCE} />
+            <Arrow x1={REFERENCE.cx + REFERENCE.r} y1={92} x2={206} y2={92} />
             <text className={styles.identifier} x={160} y={80}>
               shipmentId
             </text>

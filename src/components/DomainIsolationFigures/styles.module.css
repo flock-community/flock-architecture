@@ -7,6 +7,7 @@
   --f-muted: #5c6866;
   --f-line: #7d8a88;
   --f-disc: var(--fa-yellow);
+  --f-disc-other: var(--fa-turquoise);
   --f-disc-stroke: #0d0e0d;
   /* Anything drawn on a disc is on yellow in both colour modes */
   --f-on-disc: #0d0e0d;
@@ -63,6 +64,17 @@
 
 .disc {
   fill: var(--f-disc);
+  stroke: var(--f-disc-stroke);
+  stroke-width: 1.5;
+}
+
+/* A second context, and anything of its that another context holds */
+.discOther,
+.reference {
+  fill: var(--f-disc-other);
+}
+
+.reference {
   stroke: var(--f-disc-stroke);
   stroke-width: 1.5;
 }

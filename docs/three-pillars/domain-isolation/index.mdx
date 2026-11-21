@@ -25,9 +25,9 @@ A **domain model** is narrower by design. It takes from the domain only what is 
 >
 > George Box, statistician
 
-A model earns its place by being useful, not by being complete. In code, it is a set of types and functions named after the things the business talks about: cart, order, shipment.
+In code, a model is a set of types and functions named after the things the business talks about: cart, order, shipment.
 
-The model connects to everything that is needed to run it as a real system. Engineers will recognise hexagonal architecture, also known as ports and adapters: the model sits in the centre, and the technology plugs into it from outside. Every connection is necessary, and every connection is replaceable.
+The model connects to everything that is needed to run it as a real system. Engineers will recognise hexagonal architecture, one of several ways to arrange this: the model sits in the centre, and the technology plugs into it from outside. Every connection is necessary, and every connection is replaceable.
 
 ## Framework-agnostic
 
@@ -35,27 +35,27 @@ The domain model is a standalone part of the system. Everything else depends on 
 
 <DependencyFigure />
 
-That is what framework-agnostic means. The web layer knows the model, and the database code knows the model, but the model knows neither. In practice, this keeps framework code out of the model. Annotations, the markers with which a framework ties a class to a database table or a message format, belong on the classes that model the database and the interface, never on a domain class. A domain model will rarely be entirely free of libraries, but it should be as free of them as possible.
+That is what framework-agnostic means. The web layer knows the model, and the database code knows the model, but the model knows neither. Annotations, the markers with which a framework ties a class to a database table or a message format, belong on the classes that model the database and the interface, never on a domain class. A domain model will rarely be entirely free of libraries, but it should be as free of them as possible.
 
-Every dependency points at the model for one reason: business rules and technology should be able to change independently of each other. A change to a business rule touches only the model. A change to the technology stack touches only the technology. This works only if the surrounding code speaks to the model in the model's own terms, and never the other way around. Replacing a database then means storing the same domain objects somewhere else, and no business rule is involved.
+Every dependency points at the model for one reason: business rules and technology should be able to change independently of each other. A change to a business rule touches only the model. A change to the technology stack touches only the technology. This works only if the surrounding code speaks to the model in the model's own terms, and never the other way around. Where the domain has to reach outward, for example to store an order, it describes what it needs in its own terms, and the database code supplies that. Replacing a database then means storing the same domain objects somewhere else, and no business rule is involved.
 
 ### The price is mapping
 
-Domain isolation comes at a cost, and the cost is mapping. When the domain model, the database model and the interface model are three separate things, someone has to write the code that translates between them. That is the price of maintainability. The code is simple, there is not much of it, and it is the kind of code that today's AI tools write well. In return, each of the three models changes for its own reasons and at its own pace. A team can restructure the tables without touching a business rule, and rework the model without affecting anyone who calls the system.
+Domain isolation comes at a cost, and the cost is mapping. When the domain model, the database model and the interface model are three separate things, someone has to write the code that translates between them. The code is simple, there is not much of it, and it is the kind of code that today's AI tools write well. In return, each of the three models changes for its own reasons and at its own pace. A team can restructure the tables without touching a business rule, and rework the model without affecting anyone who calls the system. Where a service does little more than pass data on, the price outweighs the gain, and a single model is enough.
 
 ### Start with the domain
 
 An isolated domain model can be built before anything else exists. We have started new services by writing nothing but the model and a test for every case the business has, with no database layer and no API. When the tests pass, the core of the service is complete and proven, and nobody has yet had to choose a database.
 
-This runs counter to the habit of starting with the API or the tables. An interface, however, is cheap to redraw for as long as nobody depends on it. A misunderstanding of the business is expensive to correct, because it finds its way into every layer built on top of it.
+This runs counter to the habit of starting with the API or the tables. An interface, however, is cheap to redraw while nobody depends on it. A misunderstanding of the business is expensive to correct.
 
 ## Bounded contexts
 
 A domain is usually too large for a single model. The web shop as a whole is the domain, and its parts are **subdomains**: customers, checkout, payments, shipping, the warehouse. Each part has a model of its own. Domain-driven design has a name for the boundary within which one model applies: a **bounded context**.
 
-Language shows where such a boundary runs. In Checkout, the thing a customer buys is an item in a cart. In Payments, the same thing is a line item on an invoice. Neither word is wrong. Each is correct within its own context. Domain-driven design calls the language of one context its **ubiquitous language**. Every term in it comes from the business and has exactly one meaning, and the business and the engineers use it everywhere: in conversation, in documents and in code.
+Language shows where such a boundary runs. In Checkout, the thing a customer buys is an item in a cart. In Payments, the same thing is a line item on an invoice. Each is correct within its own context. Domain-driven design calls the language of one context its **ubiquitous language**. Every term in it comes from the business and has exactly one meaning, and the business and the engineers use it everywhere: in conversation, in documents and in code.
 
-A bounded context can be smaller than its subdomain. Payments is a vast subject, yet a web shop does not have to become a payment provider in order to accept payments. Its Payments context covers only the part of that subject the shop has chosen to handle itself.
+A bounded context can be smaller than its subdomain. The shop's Payments context covers only the part of payments that the shop has chosen to handle itself.
 
 Teams tend to call their bounded context simply "our domain", and the rest of this site does the same. Each circle in the picture on the [overview](/) is one bounded context.
 
@@ -65,15 +65,17 @@ A model that is free of frameworks can still lean on the model of another contex
 
 <OverlapFigure />
 
-Picture two contexts as circles in a Venn diagram. The overlap is whatever both of them know and both of them can change: a shared table, a shared class, a library of "common" models. We keep that overlap as small as possible. The least that two contexts need in order to refer to the same thing is an identifier.
+The overlap between two contexts is whatever both of them know and both of them can change: a shared table, a shared class, a library of "common" models. We keep that overlap as small as possible. The least that two contexts need to refer to the same thing is an identifier.
 
 When a customer checks out, Checkout needs to know which shipment belongs to the order. It stores the identifier of that shipment and nothing more. The carrier, the parcels and the route remain in Shipping.
 
-Every piece of data and every rule therefore has exactly one owner: one bounded context, and behind it one team. If Shipping owns shipments, Shipping is the single source of truth for them, and no other context changes them. A context that needs shipment data asks Shipping for it, by identifier, and never reads Shipping's tables. Alternatively, it keeps a read-only copy that can be discarded and rebuilt at any time. [Event-driven](/event-driven) explains how such copies are kept up to date.
+A model rarely gets by on its own data. Checkout also needs the customer's address, which belongs to another context. Such data is a given: the model uses it, never changes it, and keeps it clearly separate from what the context owns.
+
+Every piece of data and every rule has exactly one owner: one bounded context, and behind it one team. If Shipping owns shipments, Shipping is the single source of truth for them, and no other context changes them. A context that needs shipment data never reads Shipping's tables. It asks Shipping when it needs the data, which makes it depend on Shipping being available, or it keeps a read-only copy, which may lag behind and may be discarded, because Shipping remains the owner. [Event-driven](/event-driven) explains how such copies are kept up to date.
 
 ## Conclusion
 
-The domain is what the business does and the rules it follows, and the model captures the part of it that the software needs. Domain isolation keeps that model on its own. Everything else depends on the model, and the model depends on none of it, so business rules and technology can change independently, at the modest price of mapping. Each model applies within one bounded context. Contexts do not overlap: they refer to each other by identifier, and every piece of data has exactly one owner. This is the pillar we compromise on least.
+The domain is what the business does and the rules it follows, and the model captures the part of it that the software needs. Domain isolation keeps that model on its own. Everything else depends on the model, and the model depends on none of it, so business rules and technology can change independently, at the price of mapping. Each model applies within one bounded context. Contexts do not overlap: they refer to each other by identifier, and every piece of data has exactly one owner. This is the pillar we compromise on least.
 
 Domain isolation is the inside of the circle. [Specified contracts](/specified-contracts) is about what happens at its edge, [Event-driven](/event-driven) about what travels between circles, and the [overview](/) shows how the three depend on each other.
 
