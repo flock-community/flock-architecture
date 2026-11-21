@@ -31,9 +31,13 @@ A specification describes the **operations** a system offers to the outside worl
 
 The **protocol**, the way the two sides exchange data, is left open. Web requests, messages or files all qualify, as long as the contract is specified. Whether the specification comes first or last is likewise up to the team, which is why we do not call this pillar "contract first".
 
-The specification has two kinds of reader. People should find it as readable as possible, so that producer and consumers can discuss it. Machines should be able to read it too, so that code on both sides can be generated from it.
+How formal the contract has to be depends on how independently the two sides change. Where one team builds and releases both, an interface in the code is specification enough. Between teams, it takes a versioned document in a central place.
 
-A specification is also a design tool. To describe what a consumer can do, Shipping's team has to think as the teams behind the frontend and the partner's website do, so names and data are chosen with more care.
+The specification has two kinds of reader. People should find it readable, so that producer and consumers can discuss it. Machines should be able to read it too, so that code on both sides can be generated from it.
+
+A specification is only worth something if the implementation honours it, so the producer checks its implementation against the specification in every build.
+
+A specification is also a design tool, best used by producer and consumers together. A contract derived from Shipping's own model offers what Shipping happens to have, not what its consumers need. Contracts tend to succeed where producer and consumers agree on them. A contract can be flawlessly specified and still not fit its consumers.
 
 ## Keep it small
 
@@ -55,11 +59,11 @@ A new operation or a new optional field passes both tests, so the new version si
 
 A field that is removed, renamed or changed in type fails one of the two tests, and so does a new required input. Shipping then informs its consumers, publishes version 2 beside version 1 and **deprecates** version 1: it still works, but an announcement says when it goes away and what replaces it. Consumers move over before that date, on their own schedule.
 
-Every version left running costs maintenance. Shipping therefore counts the calls each version receives, per consumer, and switching version 1 off becomes a countdown rather than a guess.
+Every version left running costs maintenance. Shipping therefore counts the calls each version receives, and switching version 1 off becomes a countdown rather than a guess.
 
 <VersionsFigure />
 
-Published events cannot be switched off like an old version, and [Event-driven](/event-driven) explains what that asks of their readers.
+Events that are kept cannot be switched off like an old version, and [Event-driven](/event-driven#keeping-the-history) explains what that asks of their readers.
 
 ## Beyond the contract
 
@@ -71,7 +75,7 @@ This is **Hyrum's Law**: with enough consumers, every observable behaviour will 
 
 ## Conclusion
 
-Every system that others connect to has a contract, and the only choice is whether it is specified. A specified contract lives in one central place, readable by people and machines, and carries a version. Kept small, it leaves everything behind it free to change. Every change is a new version. A non-breaking change, compatible backward and forward, is released silently. A breaking change is announced, and old and new run side by side until the old version is switched off. The producer still has to watch over the behaviour that no contract can hold.
+Every system that others connect to has a contract, and the choice is whether to specify it, and how formally. A specified contract lives in one central place, readable by people and machines, and carries a version. Designed with its consumers and kept small, it leaves everything behind it free to change. A breaking change is announced, and old and new run side by side until the old version is switched off. The producer still has to watch over the behaviour that no contract can hold.
 
 Specified contracts are the edge of the circle. [Domain isolation](/domain-isolation) is about what the edge protects, [Event-driven](/event-driven) about what travels from one edge to the next, and the [overview](/) shows how the three depend on each other.
 

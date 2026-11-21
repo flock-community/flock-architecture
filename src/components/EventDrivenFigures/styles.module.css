@@ -42,6 +42,33 @@
   max-width: 30rem;
 }
 
+/*
+ * The quadrant has two drawings: a wide one, and a tall one for when the
+ * figure itself is narrow, on a phone or beside a wide sidebar.
+ */
+.quadrant {
+  container-type: inline-size;
+}
+
+.quadrantWide {
+  max-width: 38.75rem;
+}
+
+.quadrantCompact {
+  display: none;
+  max-width: 21.25rem;
+}
+
+@container (max-width: 32rem) {
+  .quadrantWide {
+    display: none;
+  }
+
+  .quadrantCompact {
+    display: block;
+  }
+}
+
 .panels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -144,6 +171,30 @@
   font-size: 15px;
   font-weight: 600;
   text-anchor: middle;
+}
+
+/* The two axes of the quadrant: quieter than what is drawn between them */
+.axis {
+  stroke: var(--f-line);
+  stroke-width: 1.5;
+}
+
+.axisTitle {
+  fill: var(--f-muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axisValue {
+  fill: var(--f-ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.quadrantCompact .boxLabel {
+  font-size: 14px;
 }
 
 @media (max-width: 640px) {
